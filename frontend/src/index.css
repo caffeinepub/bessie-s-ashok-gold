@@ -57,6 +57,12 @@
     --sidebar-accent-foreground: 0.18 0.01 30;
     --sidebar-border: 0.88 0.02 75;
     --sidebar-ring: 0.65 0.13 72;
+
+    /* Named semantic tokens for Home page */
+    --cream: 0.97 0.010 78;
+    --cream-warm: 0.96 0.014 76;
+    --cream-light: 0.98 0.007 80;
+    --charcoal: 0.18 0.01 30;
   }
 
   * {
@@ -82,6 +88,23 @@
   }
   .font-body {
     font-family: 'Inter', sans-serif;
+  }
+
+  /* Named background utilities */
+  .bg-cream {
+    background-color: oklch(0.97 0.010 78);
+  }
+  .bg-cream-warm {
+    background-color: oklch(0.96 0.014 76);
+  }
+  .bg-cream-light {
+    background-color: oklch(0.98 0.007 80);
+  }
+  .bg-charcoal {
+    background-color: oklch(0.18 0.01 30);
+  }
+  .text-charcoal {
+    color: oklch(0.18 0.01 30);
   }
 
   .gold-gradient {
@@ -124,5 +147,10 @@
 
   .glow-gold {
     box-shadow: 0 0 30px oklch(0.65 0.13 72 / 0.15);
+  }
+
+  /* Scale utility for product image hover */
+  .group-hover\:scale-108:hover {
+    transform: scale(1.08);
   }
 }

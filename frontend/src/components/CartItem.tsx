@@ -1,20 +1,6 @@
-import { Minus, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { Minus, Plus, Trash2, ImageOff } from 'lucide-react';
 import type { CartItem as CartItemType } from '@/hooks/useCart';
-
-const CATEGORY_IMAGES: Record<string, string> = {
-  Jewelry: '/assets/generated/product-jewelry.dim_400x400.png',
-  Collectibles: '/assets/generated/product-coin.dim_400x400.png',
-  Investments: '/assets/generated/product-coin.dim_400x400.png',
-  Accessories: '/assets/generated/product-decor.dim_400x400.png',
-};
-
-function getProductImage(item: CartItemType): string {
-  const { product } = item;
-  if (product.imageUrl && !product.imageUrl.includes('placeholder.com')) {
-    return product.imageUrl;
-  }
-  return CATEGORY_IMAGES[product.category] || '/assets/generated/product-decor.dim_400x400.png';
-}
 
 interface CartItemProps {
   item: CartItemType;
@@ -25,17 +11,31 @@ interface CartItemProps {
 export default function CartItemComponent({ item, onUpdateQuantity, onRemove }: CartItemProps) {
   const { product, quantity } = item;
   const subtotal = product.price * quantity;
-  const imgSrc = getProductImage(item);
+  const [imgFailed, setImgFailed] = useState(false);
+
+  const handleImageError = () => {
+    setImgFailed(true);
+  };
 
   return (
     <div className="flex gap-4 p-4 card-dark rounded-lg">
       {/* Image */}
       <div className="w-20 h-20 shrink-0 rounded overflow-hidden bg-secondary">
-        <img
-          src={imgSrc}
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
+        {imgFailed ? (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-secondary gap-1">
+            <ImageOff className="h-6 w-6 text-gold/30" />
+            <span className="text-[8px] font-body tracking-widest uppercase text-gold/40">
+              No Image
+            </span>
+          </div>
+        ) : (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            onError={handleImageError}
+            className="w-full h-full object-cover"
+          />
+        )}
       </div>
 
       {/* Details */}

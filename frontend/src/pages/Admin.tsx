@@ -1,33 +1,13 @@
-import { useState } from 'react';
-import { Trash2, Pencil, Check, X, Plus, Package, ShoppingBag, Loader2, Ban } from 'lucide-react';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { useState } from "react";
+import { Package, ShoppingBag, Plus, Trash2, Edit2, Check, X, ImageOff, Upload, Link } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import AdminPasswordGate from "@/components/AdminPasswordGate";
 import {
   useListProducts,
   useAddProduct,
@@ -37,524 +17,654 @@ import {
   useGetAllOrders,
   useUpdateOrderStatus,
   useCancelOrder,
-  OrderStatus,
-} from '@/hooks/useQueries';
-import type { Product, Order } from '@/backend';
-import AdminPasswordGate from '@/components/AdminPasswordGate';
+} from "@/hooks/useQueries";
+import { OrderStatus, type Product } from "@/backend";
 
-// ─── Add Product Form ─────────────────────────────────────────────────────────
+// ─── Order Status Tracker ────────────────────────────────────────────────────
 
-function AddProductForm() {
-  const addProduct = useAddProduct();
-  const [form, setForm] = useState({
-    name: '',
-    description: '',
-    price: '',
-    imageUrl: '',
-    category: '',
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const price = parseFloat(form.price);
-    if (!form.name || !form.description || isNaN(price) || !form.category) {
-      toast.error('Please fill in all required fields correctly.');
-      return;
-    }
-    try {
-      await addProduct.mutateAsync({
-        name: form.name,
-        description: form.description,
-        price,
-        imageUrl: form.imageUrl,
-        category: form.category,
-      });
-      toast.success('Product added successfully!');
-      setForm({ name: '', description: '', price: '', imageUrl: '', category: '' });
-    } catch {
-      toast.error('Failed to add product. Please try again.');
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="name" className="text-gold/80 font-display text-xs tracking-widest uppercase">
-            Product Name *
-          </Label>
-          <Input
-            id="name"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="e.g. Gold Necklace"
-            className="bg-background border-gold/30 focus:border-gold text-foreground placeholder:text-muted-foreground"
-            required
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="category" className="text-gold/80 font-display text-xs tracking-widest uppercase">
-            Category *
-          </Label>
-          <Input
-            id="category"
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            placeholder="e.g. Jewelry"
-            className="bg-background border-gold/30 focus:border-gold text-foreground placeholder:text-muted-foreground"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="description" className="text-gold/80 font-display text-xs tracking-widest uppercase">
-          Description *
-        </Label>
-        <Textarea
-          id="description"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          placeholder="Product description..."
-          rows={3}
-          className="bg-background border-gold/30 focus:border-gold text-foreground placeholder:text-muted-foreground resize-none"
-          required
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="price" className="text-gold/80 font-display text-xs tracking-widest uppercase">
-            Price (€) *
-          </Label>
-          <Input
-            id="price"
-            name="price"
-            type="number"
-            step="0.01"
-            min="0"
-            value={form.price}
-            onChange={handleChange}
-            placeholder="0.00"
-            className="bg-background border-gold/30 focus:border-gold text-foreground placeholder:text-muted-foreground"
-            required
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="imageUrl" className="text-gold/80 font-display text-xs tracking-widest uppercase">
-            Image URL
-          </Label>
-          <Input
-            id="imageUrl"
-            name="imageUrl"
-            value={form.imageUrl}
-            onChange={handleChange}
-            placeholder="https://..."
-            className="bg-background border-gold/30 focus:border-gold text-foreground placeholder:text-muted-foreground"
-          />
-        </div>
-      </div>
-
-      <Button
-        type="submit"
-        disabled={addProduct.isPending}
-        className="bg-gold hover:bg-gold-dark text-white font-display tracking-widest uppercase text-xs"
-      >
-        {addProduct.isPending ? (
-          <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin mr-2" />
-            Adding...
-          </>
-        ) : (
-          <>
-            <Plus className="h-3.5 w-3.5 mr-2" />
-            Add Product
-          </>
-        )}
-      </Button>
-    </form>
-  );
-}
-
-// ─── Product Row ──────────────────────────────────────────────────────────────
-
-function ProductRow({ product }: { product: Product }) {
-  const deleteProduct = useDeleteProduct();
-  const updatePrice = useUpdateProductPrice();
-  const updateStock = useUpdateProductStock();
-
-  const [editingPrice, setEditingPrice] = useState(false);
-  const [newPrice, setNewPrice] = useState(product.price.toFixed(2));
-
-  const handlePriceSave = async () => {
-    const price = parseFloat(newPrice);
-    if (isNaN(price) || price < 0) {
-      toast.error('Enter a valid price.');
-      return;
-    }
-    try {
-      await updatePrice.mutateAsync({ id: product.id, newPrice: price });
-      toast.success('Price updated.');
-      setEditingPrice(false);
-    } catch {
-      toast.error('Failed to update price.');
-    }
-  };
-
-  const handleStockToggle = async (checked: boolean) => {
-    try {
-      await updateStock.mutateAsync({ id: product.id, inStock: checked });
-      toast.success(`Stock status updated.`);
-    } catch {
-      toast.error('Failed to update stock status.');
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      await deleteProduct.mutateAsync(product.id);
-      toast.success('Product deleted.');
-    } catch {
-      toast.error('Failed to delete product.');
-    }
-  };
-
-  return (
-    <TableRow className="border-gold/10 hover:bg-secondary/50">
-      <TableCell className="font-body text-sm text-foreground font-medium">{product.name}</TableCell>
-      <TableCell className="font-body text-xs text-muted-foreground">{product.category}</TableCell>
-      <TableCell>
-        {editingPrice ? (
-          <div className="flex items-center gap-1.5">
-            <span className="text-gold text-sm font-body">€</span>
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              value={newPrice}
-              onChange={(e) => setNewPrice(e.target.value)}
-              className="w-24 h-7 text-xs bg-background border-gold/30 focus:border-gold text-foreground"
-              autoFocus
-            />
-            <button
-              onClick={handlePriceSave}
-              disabled={updatePrice.isPending}
-              className="p-1 text-gold hover:text-gold-dark transition-colors"
-            >
-              {updatePrice.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-            </button>
-            <button
-              onClick={() => { setEditingPrice(false); setNewPrice(product.price.toFixed(2)); }}
-              className="p-1 text-muted-foreground hover:text-destructive transition-colors"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <span className="font-serif text-sm text-gold font-semibold">€{product.price.toFixed(2)}</span>
-            <button
-              onClick={() => setEditingPrice(true)}
-              className="p-1 text-muted-foreground hover:text-gold transition-colors"
-            >
-              <Pencil className="h-3 w-3" />
-            </button>
-          </div>
-        )}
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2">
-          <Switch
-            checked={product.inStock}
-            onCheckedChange={handleStockToggle}
-            disabled={updateStock.isPending}
-            className="data-[state=checked]:bg-gold"
-          />
-          <span className={`text-xs font-body ${product.inStock ? 'text-gold' : 'text-muted-foreground'}`}>
-            {product.inStock ? 'In Stock' : 'Out of Stock'}
-          </span>
-        </div>
-      </TableCell>
-      <TableCell>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button
-              disabled={deleteProduct.isPending}
-              className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
-            >
-              {deleteProduct.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent className="bg-background border-gold/20">
-            <AlertDialogHeader>
-              <AlertDialogTitle className="font-display text-foreground">Delete Product?</AlertDialogTitle>
-              <AlertDialogDescription className="font-body text-muted-foreground">
-                This will permanently delete <strong className="text-foreground">{product.name}</strong>. This action cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="font-body border-gold/20 text-foreground hover:bg-secondary">Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDelete}
-                className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-body"
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </TableCell>
-    </TableRow>
-  );
-}
-
-// ─── Order Row ────────────────────────────────────────────────────────────────
-
-const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
-  { value: OrderStatus.pending, label: 'Pending' },
-  { value: OrderStatus.processing, label: 'Processing' },
-  { value: OrderStatus.shipped, label: 'Shipped' },
-  { value: OrderStatus.delivered, label: 'Delivered' },
+const STATUS_STEPS: { key: OrderStatus; label: string }[] = [
+  { key: OrderStatus.pending, label: "Pending" },
+  { key: OrderStatus.processing, label: "Processing" },
+  { key: OrderStatus.shipped, label: "Shipped" },
+  { key: OrderStatus.delivered, label: "Delivered" },
 ];
 
-function OrderRow({ order }: { order: Order }) {
-  const updateStatus = useUpdateOrderStatus();
-  const cancelOrder = useCancelOrder();
+function OrderStatusTracker({ status }: { status: OrderStatus }) {
+  const isCancelled = status === OrderStatus.cancelled;
 
-  const isCancelled = order.status === OrderStatus.cancelled;
+  if (isCancelled) {
+    return (
+      <div className="flex items-center gap-2 mt-3">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/30">
+          <X className="w-3.5 h-3.5 text-destructive" />
+          <span className="text-xs font-semibold text-destructive">Order Cancelled</span>
+        </div>
+      </div>
+    );
+  }
 
-  const handleStatusChange = async (value: string) => {
-    try {
-      await updateStatus.mutateAsync({ orderId: order.id, newStatus: value as OrderStatus });
-      toast.success('Order status updated.');
-    } catch {
-      toast.error('Failed to update order status.');
-    }
-  };
-
-  const handleCancel = async () => {
-    try {
-      await cancelOrder.mutateAsync(order.id);
-      toast.success('Order cancelled.');
-    } catch {
-      toast.error('Failed to cancel order.');
-    }
-  };
-
-  const statusColors: Record<string, string> = {
-    [OrderStatus.pending]: 'bg-amber-100 text-amber-700 border-amber-200',
-    [OrderStatus.processing]: 'bg-blue-100 text-blue-700 border-blue-200',
-    [OrderStatus.shipped]: 'bg-purple-100 text-purple-700 border-purple-200',
-    [OrderStatus.delivered]: 'bg-green-100 text-green-700 border-green-200',
-    [OrderStatus.cancelled]: 'bg-red-100 text-red-700 border-red-200',
-  };
+  const currentIndex = STATUS_STEPS.findIndex((s) => s.key === status);
 
   return (
-    <TableRow className="border-gold/10 hover:bg-secondary/50">
-      <TableCell className="font-display text-xs text-gold tracking-wider">#{order.id.toString()}</TableCell>
-      <TableCell className="font-body text-sm text-foreground">{order.customerInfo.name}</TableCell>
-      <TableCell className="font-body text-xs text-muted-foreground">{order.customerInfo.country}</TableCell>
-      <TableCell className="font-body text-xs text-muted-foreground">{order.customerInfo.phone}</TableCell>
-      <TableCell className="font-body text-xs text-muted-foreground max-w-[140px] truncate">{order.customerInfo.address}</TableCell>
-      <TableCell className="font-serif text-sm text-gold font-semibold">€{order.total.toFixed(2)}</TableCell>
-      <TableCell>
-        {isCancelled ? (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-body font-medium border ${statusColors[OrderStatus.cancelled]}`}>
-            Cancelled
-          </span>
-        ) : (
-          <Select value={order.status} onValueChange={handleStatusChange} disabled={updateStatus.isPending}>
-            <SelectTrigger className="w-32 h-7 text-xs bg-background border-gold/20 text-foreground">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-background border-gold/20">
-              {STATUS_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value} className="text-xs font-body">
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </TableCell>
-      <TableCell>
-        {!isCancelled && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button
-                disabled={cancelOrder.isPending}
-                className="flex items-center gap-1 px-2 py-1 text-[10px] font-body text-destructive border border-destructive/30 rounded hover:bg-destructive/10 transition-colors"
-              >
-                {cancelOrder.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Ban className="h-3 w-3" />}
-                Cancel
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="bg-background border-gold/20">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="font-display text-foreground">Cancel Order #{order.id.toString()}?</AlertDialogTitle>
-                <AlertDialogDescription className="font-body text-muted-foreground">
-                  This will cancel the order for <strong className="text-foreground">{order.customerInfo.name}</strong>. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="font-body border-gold/20 text-foreground hover:bg-secondary">Keep Order</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleCancel}
-                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground font-body"
+    <div className="mt-3 w-full">
+      <div className="flex items-center w-full">
+        {STATUS_STEPS.map((step, index) => {
+          const isCompleted = index < currentIndex;
+          const isActive = index === currentIndex;
+          const isPending = index > currentIndex;
+
+          return (
+            <div key={step.key} className="flex items-center flex-1 last:flex-none">
+              {/* Step circle */}
+              <div className="flex flex-col items-center gap-1">
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all ${
+                    isCompleted
+                      ? "bg-gold border-gold"
+                      : isActive
+                      ? "bg-gold border-gold shadow-md shadow-gold/40"
+                      : "bg-background border-border"
+                  }`}
                 >
-                  Cancel Order
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </TableCell>
-    </TableRow>
+                  {isCompleted ? (
+                    <Check className="w-3.5 h-3.5 text-white" />
+                  ) : isActive ? (
+                    <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                  ) : (
+                    <div className={`w-2 h-2 rounded-full ${isPending ? "bg-muted-foreground/30" : ""}`} />
+                  )}
+                </div>
+                <span
+                  className={`text-[10px] font-medium whitespace-nowrap ${
+                    isCompleted || isActive ? "text-gold" : "text-muted-foreground"
+                  }`}
+                >
+                  {step.label}
+                </span>
+              </div>
+
+              {/* Connector line */}
+              {index < STATUS_STEPS.length - 1 && (
+                <div
+                  className={`flex-1 h-0.5 mx-1 mb-4 rounded-full transition-all ${
+                    index < currentIndex ? "bg-gold" : "bg-border"
+                  }`}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
-// ─── Main Admin Page ──────────────────────────────────────────────────────────
+// ─── Product Thumbnail ────────────────────────────────────────────────────────
+
+function ProductThumbnail({ imageUrl, name }: { imageUrl: string; name: string }) {
+  const [imgError, setImgError] = useState(false);
+
+  if (!imageUrl || imgError) {
+    return (
+      <div className="w-12 h-12 rounded-lg border border-gold/20 bg-gold/5 flex items-center justify-center flex-shrink-0">
+        <ImageOff className="w-5 h-5 text-gold/40" />
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imageUrl}
+      alt={name}
+      className="w-12 h-12 rounded-lg object-cover border border-gold/20 flex-shrink-0"
+      onError={() => setImgError(true)}
+    />
+  );
+}
+
+// ─── Admin Content (rendered inside the password gate) ───────────────────────
 
 function AdminContent() {
-  const { data: products, isLoading: productsLoading } = useListProducts();
-  const { data: orders, isLoading: ordersLoading } = useGetAllOrders();
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    description: "",
+    price: "",
+    imageUrl: "",
+    category: "",
+  });
+  const [imageInputMode, setImageInputMode] = useState<"upload" | "url">("upload");
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [editingPrice, setEditingPrice] = useState<{ id: bigint; value: string } | null>(null);
+
+  const { data: products = [], isLoading: productsLoading } = useListProducts();
+  const { data: orders = [], isLoading: ordersLoading } = useGetAllOrders();
+  const addProductMutation = useAddProduct();
+  const deleteProductMutation = useDeleteProduct();
+  const updatePriceMutation = useUpdateProductPrice();
+  const updateStockMutation = useUpdateProductStock();
+  const updateOrderStatusMutation = useUpdateOrderStatus();
+  const cancelOrderMutation = useCancelOrder();
+
+  // Build a product lookup map for order items
+  const productMap = new Map<string, Product>(
+    products.map((p) => [p.id.toString(), p])
+  );
+
+  // ── Handlers ──────────────────────────────────────────────────────────────
+
+  function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUrl = ev.target?.result as string;
+      setNewProduct((p) => ({ ...p, imageUrl: dataUrl }));
+      setImagePreview(dataUrl);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleImageUrlChange(url: string) {
+    setNewProduct((p) => ({ ...p, imageUrl: url }));
+    setImagePreview(url);
+  }
+
+  async function handleAddProduct(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newProduct.name || !newProduct.price) return;
+    await addProductMutation.mutateAsync({
+      name: newProduct.name,
+      description: newProduct.description,
+      price: parseFloat(newProduct.price),
+      imageUrl: newProduct.imageUrl,
+      category: newProduct.category,
+    });
+    setNewProduct({ name: "", description: "", price: "", imageUrl: "", category: "" });
+    setImagePreview("");
+  }
+
+  async function handleDeleteProduct(id: bigint) {
+    await deleteProductMutation.mutateAsync(id);
+  }
+
+  async function handleSavePrice(id: bigint) {
+    if (!editingPrice) return;
+    await updatePriceMutation.mutateAsync({ id, newPrice: parseFloat(editingPrice.value) });
+    setEditingPrice(null);
+  }
+
+  async function handleToggleStock(product: Product) {
+    await updateStockMutation.mutateAsync({ id: product.id, inStock: !product.inStock });
+  }
+
+  async function handleOrderStatusChange(orderId: bigint, newStatus: OrderStatus) {
+    await updateOrderStatusMutation.mutateAsync({ orderId, newStatus });
+  }
+
+  async function handleCancelOrder(orderId: bigint) {
+    await cancelOrderMutation.mutateAsync(orderId);
+  }
+
+  function getStatusBadgeVariant(
+    status: OrderStatus
+  ): "default" | "secondary" | "outline" | "destructive" {
+    switch (status) {
+      case OrderStatus.delivered:
+        return "default";
+      case OrderStatus.shipped:
+        return "secondary";
+      case OrderStatus.processing:
+        return "outline";
+      case OrderStatus.cancelled:
+        return "destructive";
+      default:
+        return "outline";
+    }
+  }
+
+  function formatOrderStatus(status: OrderStatus): string {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <main className="container mx-auto px-4 md:px-6 py-10">
-      {/* Header */}
-      <div className="mb-8">
-        <p className="font-body text-xs tracking-[0.3em] uppercase text-gold mb-1">Dashboard</p>
-        <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground">
-          Admin <span className="gold-text">Panel</span>
-        </h1>
-        <div className="mt-3 w-16 h-px bg-gold/40" />
-      </div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground">Admin Panel</h1>
+          <p className="text-muted-foreground mt-1">Manage your products and orders</p>
+        </div>
 
-      <Tabs defaultValue="products">
-        <TabsList className="bg-secondary border border-gold/15 mb-6">
-          <TabsTrigger
-            value="products"
-            className="font-display text-xs tracking-widest uppercase data-[state=active]:bg-gold data-[state=active]:text-white text-foreground/60"
-          >
-            <Package className="h-3.5 w-3.5 mr-1.5" />
-            Products
-          </TabsTrigger>
-          <TabsTrigger
-            value="orders"
-            className="font-display text-xs tracking-widest uppercase data-[state=active]:bg-gold data-[state=active]:text-white text-foreground/60"
-          >
-            <ShoppingBag className="h-3.5 w-3.5 mr-1.5" />
-            Orders
-          </TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="products">
+          <TabsList className="mb-6">
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              Products
+            </TabsTrigger>
+            <TabsTrigger value="orders" className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4" />
+              Orders
+              {orders.length > 0 && (
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  {orders.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Products Tab */}
-        <TabsContent value="products" className="space-y-6">
-          {/* Add Product */}
-          <div className="card-dark rounded-lg p-6">
-            <h2 className="font-display text-sm tracking-widest uppercase text-foreground mb-5 flex items-center gap-2">
-              <Plus className="h-4 w-4 text-gold" />
-              Add New Product
-            </h2>
-            <AddProductForm />
-          </div>
+          {/* ── Products Tab ─────────────────────────────────────────────── */}
+          <TabsContent value="products">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Add Product Form */}
+              <Card className="lg:col-span-1 border-gold/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Plus className="w-5 h-5 text-gold" />
+                    Add Product
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleAddProduct} className="space-y-3">
+                    <Input
+                      placeholder="Product name *"
+                      value={newProduct.name}
+                      onChange={(e) => setNewProduct((p) => ({ ...p, name: e.target.value }))}
+                      required
+                    />
+                    <Input
+                      placeholder="Description"
+                      value={newProduct.description}
+                      onChange={(e) =>
+                        setNewProduct((p) => ({ ...p, description: e.target.value }))
+                      }
+                    />
+                    <Input
+                      placeholder="Price (€) *"
+                      type="number"
+                      step="0.01"
+                      value={newProduct.price}
+                      onChange={(e) => setNewProduct((p) => ({ ...p, price: e.target.value }))}
+                      required
+                    />
+                    <Input
+                      placeholder="Category"
+                      value={newProduct.category}
+                      onChange={(e) =>
+                        setNewProduct((p) => ({ ...p, category: e.target.value }))
+                      }
+                    />
 
-          {/* Product List */}
-          <div className="card-dark rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gold/10">
-              <h2 className="font-display text-sm tracking-widest uppercase text-foreground">
-                Product Inventory ({products?.length ?? 0})
-              </h2>
+                    {/* Image input mode toggle */}
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={imageInputMode === "upload" ? "default" : "outline"}
+                        className={
+                          imageInputMode === "upload" ? "bg-gold text-white hover:bg-gold/90" : ""
+                        }
+                        onClick={() => setImageInputMode("upload")}
+                      >
+                        <Upload className="w-3.5 h-3.5 mr-1" />
+                        Upload
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={imageInputMode === "url" ? "default" : "outline"}
+                        className={
+                          imageInputMode === "url" ? "bg-gold text-white hover:bg-gold/90" : ""
+                        }
+                        onClick={() => setImageInputMode("url")}
+                      >
+                        <Link className="w-3.5 h-3.5 mr-1" />
+                        URL
+                      </Button>
+                    </div>
+
+                    {imageInputMode === "upload" ? (
+                      <div className="border-2 border-dashed border-gold/30 rounded-lg p-3 text-center cursor-pointer hover:border-gold/60 transition-colors">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          id="product-image-upload"
+                          onChange={handleImageFileChange}
+                        />
+                        <label htmlFor="product-image-upload" className="cursor-pointer">
+                          <Upload className="w-6 h-6 text-gold/50 mx-auto mb-1" />
+                          <p className="text-xs text-muted-foreground">
+                            Tap to upload from photo library
+                          </p>
+                        </label>
+                      </div>
+                    ) : (
+                      <Input
+                        placeholder="Image URL"
+                        value={newProduct.imageUrl}
+                        onChange={(e) => handleImageUrlChange(e.target.value)}
+                      />
+                    )}
+
+                    {/* Image preview */}
+                    {imagePreview && (
+                      <div className="relative">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-full h-32 object-cover rounded-lg border border-gold/20"
+                        />
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="destructive"
+                          className="absolute top-1 right-1 w-6 h-6"
+                          onClick={() => {
+                            setImagePreview("");
+                            setNewProduct((p) => ({ ...p, imageUrl: "" }));
+                          }}
+                        >
+                          <X className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full bg-gold text-white hover:bg-gold/90"
+                      disabled={addProductMutation.isPending}
+                    >
+                      {addProductMutation.isPending ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Adding...
+                        </span>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Product
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+
+              {/* Products List */}
+              <div className="lg:col-span-2 space-y-3">
+                {productsLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                  </div>
+                ) : products.length === 0 ? (
+                  <Card className="border-gold/20">
+                    <CardContent className="py-12 text-center text-muted-foreground">
+                      No products yet. Add your first product!
+                    </CardContent>
+                  </Card>
+                ) : (
+                  products.map((product) => (
+                    <Card key={product.id.toString()} className="border-gold/20">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          {/* Product thumbnail */}
+                          <ProductThumbnail imageUrl={product.imageUrl} name={product.name} />
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <h3 className="font-semibold text-foreground truncate">
+                                  {product.name}
+                                </h3>
+                                <p className="text-xs text-muted-foreground truncate">
+                                  {product.category}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className={`text-xs h-7 px-2 ${
+                                    product.inStock
+                                      ? "border-green-500/50 text-green-600 hover:bg-green-50"
+                                      : "border-red-400/50 text-red-500 hover:bg-red-50"
+                                  }`}
+                                  onClick={() => handleToggleStock(product)}
+                                  disabled={updateStockMutation.isPending}
+                                >
+                                  {product.inStock ? "In Stock" : "Out of Stock"}
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  variant="ghost"
+                                  className="w-7 h-7 text-destructive hover:bg-destructive/10"
+                                  onClick={() => handleDeleteProduct(product.id)}
+                                  disabled={deleteProductMutation.isPending}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* Price editing */}
+                            <div className="flex items-center gap-2 mt-2">
+                              {editingPrice?.id === product.id ? (
+                                <>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={editingPrice.value}
+                                    onChange={(e) =>
+                                      setEditingPrice({ id: product.id, value: e.target.value })
+                                    }
+                                    className="h-7 w-24 text-sm"
+                                  />
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="w-7 h-7 text-green-600"
+                                    onClick={() => handleSavePrice(product.id)}
+                                    disabled={updatePriceMutation.isPending}
+                                  >
+                                    <Check className="w-3.5 h-3.5" />
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="w-7 h-7 text-muted-foreground"
+                                    onClick={() => setEditingPrice(null)}
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </Button>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-sm font-semibold text-gold">
+                                    €{product.price.toFixed(2)}
+                                  </span>
+                                  <Button
+                                    size="icon"
+                                    variant="ghost"
+                                    className="w-6 h-6 text-muted-foreground hover:text-gold"
+                                    onClick={() =>
+                                      setEditingPrice({
+                                        id: product.id,
+                                        value: product.price.toString(),
+                                      })
+                                    }
+                                  >
+                                    <Edit2 className="w-3 h-3" />
+                                  </Button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
             </div>
-            {productsLoading ? (
-              <div className="p-6 space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-full bg-secondary" />
-                ))}
-              </div>
-            ) : products && products.length > 0 ? (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gold/10 hover:bg-transparent">
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Name</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Category</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Price (€)</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Stock</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {products.map((product) => (
-                      <ProductRow key={product.id.toString()} product={product} />
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="p-10 text-center">
-                <Package className="h-10 w-10 text-gold/20 mx-auto mb-3" />
-                <p className="font-body text-sm text-muted-foreground">No products yet. Add your first product above.</p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
+          </TabsContent>
 
-        {/* Orders Tab */}
-        <TabsContent value="orders">
-          <div className="card-dark rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gold/10">
-              <h2 className="font-display text-sm tracking-widest uppercase text-foreground">
-                Orders ({orders?.length ?? 0})
-              </h2>
-            </div>
+          {/* ── Orders Tab ───────────────────────────────────────────────── */}
+          <TabsContent value="orders">
             {ordersLoading ? (
-              <div className="p-6 space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-full bg-secondary" />
-                ))}
+              <div className="flex items-center justify-center py-12">
+                <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
               </div>
-            ) : orders && orders.length > 0 ? (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-gold/10 hover:bg-transparent">
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Order ID</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Customer</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Country</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Phone</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Address</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Total (€)</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Status</TableHead>
-                      <TableHead className="font-display text-[10px] tracking-widest uppercase text-gold/70">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orders.map((order) => (
-                      <OrderRow key={order.id.toString()} order={order} />
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+            ) : orders.length === 0 ? (
+              <Card className="border-gold/20">
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  No orders yet.
+                </CardContent>
+              </Card>
             ) : (
-              <div className="p-10 text-center">
-                <ShoppingBag className="h-10 w-10 text-gold/20 mx-auto mb-3" />
-                <p className="font-body text-sm text-muted-foreground">No orders yet.</p>
+              <div className="space-y-4">
+                {[...orders]
+                  .sort((a, b) => Number(b.timestamp - a.timestamp))
+                  .map((order) => (
+                    <Card key={order.id.toString()} className="border-gold/20">
+                      <CardContent className="p-5">
+                        {/* Order header */}
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-foreground">
+                                Order #{order.id.toString()}
+                              </span>
+                              <Badge variant={getStatusBadgeVariant(order.status)}>
+                                {formatOrderStatus(order.status)}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {new Date(Number(order.timestamp) / 1_000_000).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-gold text-lg">
+                              €{order.total.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Status tracker */}
+                        <OrderStatusTracker status={order.status} />
+
+                        <Separator className="my-4" />
+
+                        {/* Customer info */}
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mb-4">
+                          <div>
+                            <span className="text-muted-foreground text-xs">Customer</span>
+                            <p className="font-medium">{order.customerInfo.name}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground text-xs">Phone</span>
+                            <p className="font-medium">{order.customerInfo.phone}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground text-xs">Country</span>
+                            <p className="font-medium">{order.customerInfo.country}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground text-xs">Address</span>
+                            <p className="font-medium">{order.customerInfo.address}</p>
+                          </div>
+                        </div>
+
+                        {/* Order items with thumbnails */}
+                        <div className="space-y-2 mb-4">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                            Items
+                          </p>
+                          {order.items.map(([productId, quantity], idx) => {
+                            const product = productMap.get(productId.toString());
+                            return (
+                              <div
+                                key={idx}
+                                className="flex items-center gap-3 p-2 rounded-lg bg-gold/5 border border-gold/10"
+                              >
+                                <ProductThumbnail
+                                  imageUrl={product?.imageUrl ?? ""}
+                                  name={product?.name ?? `Product #${productId}`}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-foreground truncate">
+                                    {product?.name ?? `Product #${productId.toString()}`}
+                                  </p>
+                                  {product?.category && (
+                                    <p className="text-xs text-muted-foreground">
+                                      {product.category}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="text-right flex-shrink-0">
+                                  <p className="text-sm font-semibold text-gold">
+                                    {product ? `€${product.price.toFixed(2)}` : ""}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Qty: {quantity.toString()}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        {/* Status controls */}
+                        {order.status !== OrderStatus.cancelled && (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <Select
+                              value={order.status}
+                              onValueChange={(val) =>
+                                handleOrderStatusChange(order.id, val as OrderStatus)
+                              }
+                              disabled={updateOrderStatusMutation.isPending}
+                            >
+                              <SelectTrigger className="w-40 h-8 text-sm border-gold/30">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value={OrderStatus.pending}>Pending</SelectItem>
+                                <SelectItem value={OrderStatus.processing}>Processing</SelectItem>
+                                <SelectItem value={OrderStatus.shipped}>Shipped</SelectItem>
+                                <SelectItem value={OrderStatus.delivered}>Delivered</SelectItem>
+                              </SelectContent>
+                            </Select>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                              onClick={() => handleCancelOrder(order.id)}
+                              disabled={cancelOrderMutation.isPending}
+                            >
+                              {cancelOrderMutation.isPending ? (
+                                <div className="w-3 h-3 border border-destructive/30 border-t-destructive rounded-full animate-spin mr-1" />
+                              ) : (
+                                <X className="w-3 h-3 mr-1" />
+                              )}
+                              Cancel Order
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
               </div>
             )}
-          </div>
-        </TabsContent>
-      </Tabs>
-    </main>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
   );
 }
+
+// ─── Admin Page (wrapped in password gate) ───────────────────────────────────
 
 export default function Admin() {
   return (

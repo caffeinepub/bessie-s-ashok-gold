@@ -1,19 +1,12 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, ShoppingCart, Minus, Plus, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Minus, Plus, AlertCircle, ImageOff } from 'lucide-react';
 import { useGetProduct } from '@/hooks/useQueries';
 import { useCart } from '@/hooks/useCart';
 import { useAddToCart } from '@/hooks/useQueries';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-
-const CATEGORY_IMAGES: Record<string, string> = {
-  Jewelry: '/assets/generated/product-jewelry.dim_400x400.png',
-  Collectibles: '/assets/generated/product-coin.dim_400x400.png',
-  Investments: '/assets/generated/product-coin.dim_400x400.png',
-  Accessories: '/assets/generated/product-decor.dim_400x400.png',
-};
 
 export default function ProductDetail() {
   const { id } = useParams({ from: '/product/$id' });
@@ -23,6 +16,7 @@ export default function ProductDetail() {
   const { addItem } = useCart();
   const addToCartMutation = useAddToCart();
   const [quantity, setQuantity] = useState(1);
+  const [imgFailed, setImgFailed] = useState(false);
 
   if (isLoading) {
     return (
@@ -59,10 +53,10 @@ export default function ProductDetail() {
   }
 
   const isOutOfStock = !product.inStock;
-  const imgSrc =
-    product.imageUrl && !product.imageUrl.includes('placeholder.com')
-      ? product.imageUrl
-      : CATEGORY_IMAGES[product.category] || '/assets/generated/product-decor.dim_400x400.png';
+
+  const handleImageError = () => {
+    setImgFailed(true);
+  };
 
   const handleAddToCart = () => {
     addItem(product, quantity);
@@ -91,11 +85,21 @@ export default function ProductDetail() {
         {/* Image */}
         <div className="relative">
           <div className="aspect-square rounded-lg overflow-hidden bg-secondary border border-gold/15">
-            <img
-              src={imgSrc}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+            {imgFailed ? (
+              <div className="w-full h-full flex flex-col items-center justify-center bg-secondary gap-3">
+                <ImageOff className="h-16 w-16 text-gold/30" />
+                <span className="text-xs font-body tracking-widest uppercase text-gold/40">
+                  No Image
+                </span>
+              </div>
+            ) : (
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                onError={handleImageError}
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
         </div>
 
@@ -168,15 +172,15 @@ export default function ProductDetail() {
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock || addToCartMutation.isPending}
-              className="flex-1 flex items-center justify-center gap-2 py-3 border border-gold text-gold font-display text-sm tracking-widest uppercase rounded hover:bg-gold/10 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gold text-white font-display text-sm tracking-widest uppercase rounded hover:bg-gold-dark transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-gold"
             >
               <ShoppingCart className="h-4 w-4" />
-              Add to Cart
+              {addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
             </button>
             <button
               onClick={handleBuyNow}
               disabled={isOutOfStock}
-              className="flex-1 py-3 bg-gold text-white font-display text-sm tracking-widest uppercase rounded hover:bg-gold-dark transition-all duration-200 shadow-gold disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border border-gold text-gold font-display text-sm tracking-widest uppercase rounded hover:bg-gold/10 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Buy Now
             </button>
@@ -184,7 +188,7 @@ export default function ProductDetail() {
 
           {isOutOfStock && (
             <p className="text-xs text-muted-foreground font-body text-center">
-              This item is currently out of stock. Check back soon.
+              This item is currently out of stock.
             </p>
           )}
         </div>

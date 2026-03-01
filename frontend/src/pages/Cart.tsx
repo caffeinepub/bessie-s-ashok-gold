@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { sendWhatsAppNotification } from '@/utils/whatsapp';
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -33,6 +34,14 @@ export default function Cart() {
   const handleCheckout = async () => {
     if (!validate()) return;
 
+    // Capture items snapshot before clearing cart
+    const orderItems = items.map((item) => ({
+      productName: item.product.name,
+      quantity: item.quantity,
+      price: item.product.price,
+    }));
+    const orderTotal = subtotal;
+
     // Sync cart to backend before placing order
     for (const item of items) {
       await addToCartMutation.mutateAsync({
@@ -46,6 +55,18 @@ export default function Cart() {
       {
         onSuccess: (orderId) => {
           if (orderId !== null && orderId !== undefined) {
+            // Send WhatsApp notification with full order details
+            sendWhatsAppNotification({
+              orderId: orderId.toString(),
+              customerName: form.name,
+              customerCountry: form.country,
+              customerPhone: form.phone,
+              customerAddress: form.address,
+              items: orderItems,
+              total: orderTotal,
+              timestamp: new Date(),
+            });
+
             clearCart();
             navigate({ to: '/order-confirmation/$orderId', params: { orderId: orderId.toString() } });
           } else {

@@ -1,9 +1,13 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
+  "projectStateVersion": 29,
   "summary": "E-commerce website for 'Bessie's Ashok Gold' brand/product.",
-  "architectural_notes": [],
-  "known_issues": [],
+  "architectural_notes": [
+    "Product images use HTTP URLs provided by admin; frontend must render them directly without modification or proxying."
+  ],
+  "known_issues": [
+    "Images not displaying in the Shop section"
+  ],
   "isFixRequest": false,
   "existing_features": [
     {
@@ -93,6 +97,86 @@
         "REQ-14"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-fix-product-images-not-rendering-in-the-shop-page-product-grid-investigate-the-image-url-format-stored-in-the-backend-for-seeded-products-and-any-products-added-via-the-admin-panel-ensure-the-productcard-component-correctly-renders-images-from-the-imageurl-field-handle-cases-where-the-url-may-be-empty-malformed-or-a-relative-path-add-a-graceful-fallback-e-g-a-gold-tinted-placeholder-graphic-or-a-styled-no-image-block-when-the-imageurl-is-missing-or-fails-to-load",
+      "title": "Fix product images not rendering in the Shop page product grid. Investigate the image URL format stored in the backend for seeded products and any products added via the admin panel. Ensure the ProductCard component correctly renders images from the imageUrl field — handle cases where the URL may be empty, malformed, or a relative path. Add a graceful fallback (e.g., a gold-tinted placeholder graphic or a styled 'No Image' block) when the imageUrl is missing or fails to load.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-image-rendering-in-productcard-productdetail-cartitem-and-home-featured-products-so-that-any-product-imageurl-containing-a-valid-http-or-https-url-is-rendered-directly-as-the-img-src-without-modification-transformation-or-prefixing-remove-any-logic-that-rewrites-proxies-or-replaces-http-urls-with-local-paths-or-placeholders-only-fall-back-to-the-styled-no-image-placeholder-when-the-imageurl-field-is-truly-empty-null-or-results-in-a-load-error-onerror-handler",
+      "title": "Fix image rendering in ProductCard, ProductDetail, CartItem, and Home featured products so that any product imageUrl containing a valid HTTP or HTTPS URL is rendered directly as the <img> src without modification, transformation, or prefixing. Remove any logic that rewrites, proxies, or replaces HTTP URLs with local paths or placeholders. Only fall back to the styled 'No Image' placeholder when the imageUrl field is truly empty, null, or results in a load error (onerror handler).",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-productcard-tsx-productdetail-tsx-cartitem-tsx-and-the-featured-products-section-in-home-tsx-add-explicit-console-logging-of-the-imageurl-value-at-render-time-to-aid-debugging-ensure-the-img-src-attribute-is-set-directly-to-the-imageurl-string-without-any-transformation-encoding-or-prefixing-the-onerror-handler-must-only-swap-to-the-no-image-placeholder-it-must-not-suppress-the-initial-render-attempt-also-ensure-the-img-element-does-not-have-any-css-that-hides-it-e-g-hidden-opacity-0-or-display-none-unless-imageurl-is-definitively-empty",
+      "title": "In ProductCard.tsx, ProductDetail.tsx, CartItem.tsx, and the featured products section in Home.tsx, add explicit console logging of the imageUrl value at render time to aid debugging. Ensure the <img> src attribute is set directly to the imageUrl string without any transformation, encoding, or prefixing. The onError handler must only swap to the 'No Image' placeholder — it must not suppress the initial render attempt. Also ensure the img element does not have any CSS that hides it (e.g. hidden, opacity-0, or display:none) unless imageUrl is definitively empty.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-completely-rewrite-the-image-rendering-logic-in-productcard-tsx-productdetail-tsx-cartitem-tsx-and-the-featured-products-section-in-home-tsx-remove-all-category-based-fallback-asset-logic-url-rewriting-proxying-or-local-path-substitution-the-img-src-must-be-set-to-the-raw-imageurl-string-from-the-product-data-no-wrappers-no-ternary-overrides-no-transformation-functions-only-apply-the-no-image-placeholder-via-the-onerror-handler-when-the-browser-itself-fails-to-load-the-image-add-a-console-log-of-the-imageurl-immediately-before-the-return-statement-in-each-component-to-verify-what-value-is-being-passed",
+      "title": "Completely rewrite the image rendering logic in ProductCard.tsx, ProductDetail.tsx, CartItem.tsx, and the featured products section in Home.tsx. Remove all category-based fallback asset logic, URL rewriting, proxying, or local path substitution. The img src must be set to the raw imageUrl string from the product data — no wrappers, no ternary overrides, no transformation functions. Only apply the 'No Image' placeholder via the onError handler when the browser itself fails to load the image. Add a console.log of the imageUrl immediately before the return statement in each component to verify what value is being passed.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-productcard-tsx-productdetail-tsx-cartitem-tsx-and-the-featured-products-section-in-home-tsx-ensure-the-img-src-attribute-is-set-directly-to-the-raw-imageurl-string-from-product-data-with-no-transformation-encoding-or-prefixing-the-onerror-handler-must-only-swap-in-the-styled-no-image-placeholder-and-must-not-suppress-the-initial-render-attempt-remove-any-logic-that-conditionally-hides-or-replaces-the-image-element-before-the-browser-has-attempted-to-load-it",
+      "title": "In ProductCard.tsx, ProductDetail.tsx, CartItem.tsx, and the featured products section in Home.tsx, ensure the <img> src attribute is set directly to the raw imageUrl string from product data with no transformation, encoding, or prefixing. The onError handler must only swap in the styled 'No Image' placeholder and must not suppress the initial render attempt. Remove any logic that conditionally hides or replaces the image element before the browser has attempted to load it.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-admin-panel-s-add-product-form-admin-tsx-replace-the-plain-text-input-field-for-image-url-with-a-dual-mode-image-input-that-allows-the-admin-to-either-a-upload-a-photo-directly-from-their-device-s-photo-library-using-a-file-input-accept-image-or-b-manually-enter-an-image-url-as-before-when-a-file-is-selected-via-the-file-picker-convert-it-to-a-base64-data-url-using-filereader-and-store-that-as-the-product-s-imageurl-show-a-small-preview-thumbnail-of-the-selected-uploaded-image-before-submission-the-toggle-between-upload-photo-and-enter-url-modes-should-be-clearly-labeled-and-visually-consistent-with-the-site-s-gold-accent-theme",
+      "title": "In the Admin Panel's 'Add Product' form (Admin.tsx), replace the plain text input field for 'Image URL' with a dual-mode image input that allows the admin to either (a) upload a photo directly from their device's photo library using a file input (accept='image/*'), or (b) manually enter an image URL as before. When a file is selected via the file picker, convert it to a Base64 data URL using FileReader and store that as the product's imageUrl. Show a small preview thumbnail of the selected/uploaded image before submission. The toggle between 'Upload Photo' and 'Enter URL' modes should be clearly labeled and visually consistent with the site's gold-accent theme.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-admin-panel-s-orders-section-admin-tsx-add-a-visual-order-status-progress-bar-tracker-per-order-row-that-displays-the-current-order-status-pending-processing-shipped-delivered-with-a-special-cancelled-state-the-tracker-should-visually-highlight-the-current-step-and-be-styled-consistently-with-the-site-s-gold-accent-bright-theme-reuse-or-adapt-the-existing-orderstatustracker-component-if-suitable",
+      "title": "In the Admin Panel's Orders section (Admin.tsx), add a visual order status progress bar/tracker per order row that displays the current order status (Pending → Processing → Shipped → Delivered, with a special Cancelled state). The tracker should visually highlight the current step and be styled consistently with the site's gold-accent bright theme. Reuse or adapt the existing OrderStatusTracker component if suitable.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-the-admin-panel-s-orders-section-admin-tsx-display-a-thumbnail-image-for-each-product-within-an-order-s-line-items-for-each-item-in-an-order-fetch-or-derive-the-product-s-imageurl-from-the-products-list-already-available-via-the-existing-usequeries-hooks-and-render-it-as-a-small-thumbnail-approximately-48-48px-alongside-the-product-name-and-quantity-use-the-same-no-image-fallback-imageoff-icon-or-gold-tinted-placeholder-on-image-load-error-consistent-with-the-rest-of-the-site",
+      "title": "In the Admin Panel's Orders section (Admin.tsx), display a thumbnail image for each product within an order's line items. For each item in an order, fetch or derive the product's imageUrl (from the products list already available via the existing useQueries hooks) and render it as a small thumbnail (approximately 48×48px) alongside the product name and quantity. Use the same 'No Image' fallback (ImageOff icon or gold-tinted placeholder) on image load error, consistent with the rest of the site.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-redesign-the-home-page-frontend-src-pages-home-tsx-with-a-polished-professional-layout-that-is-fully-consistent-with-the-site-s-existing-bright-cream-ivory-and-gold-accent-theme-the-new-layout-must-include-1-a-prominent-hero-section-with-a-bold-elegant-headline-a-short-tagline-and-a-clear-call-to-action-button-e-g-shop-now-styled-with-the-gold-accent-color-2-a-trust-feature-highlights-bar-beneath-the-hero-showcasing-3-4-brand-value-icons-e-g-premium-quality-secure-checkout-fast-delivery-authentic-gold-using-small-icons-and-short-labels-with-gold-accents-3-a-featured-products-section-with-a-refined-section-heading-and-a-responsive-4-column-grid-of-productcard-components-up-to-4-featured-products-loaded-via-existing-react-query-hooks-4-a-brief-about-brand-story-section-with-a-short-paragraph-about-bessie-s-ashok-gold-using-elegant-serif-typography-and-a-subtle-gold-divider-and-5-a-clean-visually-separated-footer-call-to-action-strip-linking-to-the-shop-and-contact-pages-all-sections-must-use-bright-white-ffffff-or-warm-cream-fffdf5-fff8e7-backgrounds-deep-charcoal-1a1a1a-2d2d2d-body-text-and-gold-c9a84c-for-borders-accents-headings-and-buttons-typography-must-feel-premium-use-the-existing-display-serif-font-family-for-headings-the-overall-page-should-feel-spacious-with-generous-padding-clear-visual-hierarchy-and-smooth-hover-transitions-on-interactive-elements",
+      "title": "Redesign the Home page (frontend/src/pages/Home.tsx) with a polished, professional layout that is fully consistent with the site's existing bright cream/ivory and gold-accent theme. The new layout must include: (1) a prominent hero section with a bold, elegant headline, a short tagline, and a clear call-to-action button (e.g., 'Shop Now') styled with the gold accent color; (2) a trust/feature highlights bar beneath the hero showcasing 3–4 brand value icons (e.g., Premium Quality, Secure Checkout, Fast Delivery, Authentic Gold) using small icons and short labels with gold accents; (3) a 'Featured Products' section with a refined section heading and a responsive 4-column grid of ProductCard components (up to 4 featured products loaded via existing React Query hooks); (4) a brief 'About / Brand Story' section with a short paragraph about Bessie's Ashok Gold, using elegant serif typography and a subtle gold divider; and (5) a clean, visually separated footer call-to-action strip linking to the Shop and Contact pages. All sections must use bright white (#FFFFFF) or warm cream (#FFFDF5 / #FFF8E7) backgrounds, deep charcoal (#1A1A1A / #2D2D2D) body text, and gold (#C9A84C) for borders, accents, headings, and buttons. Typography must feel premium — use the existing display/serif font family for headings. The overall page should feel spacious with generous padding, clear visual hierarchy, and smooth hover transitions on interactive elements.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-when-a-new-order-is-successfully-placed-via-the-placeorder-backend-function-immediately-trigger-a-whatsapp-notification-to-the-number-9137202881-formatted-as-919137202881-by-opening-a-pre-filled-whatsapp-message-url-the-notification-must-be-sent-from-the-frontend-immediately-after-a-successful-order-placement-i-e-after-the-placeorder-mutation-resolves-successfully-the-message-must-include-order-id-buyer-s-full-name-country-phone-number-address-a-list-of-all-ordered-items-product-name-and-quantity-for-each-the-order-total-in-euro-and-the-order-timestamp-construct-the-whatsapp-deep-link-url-as-https-wa-me-919137202881-text-url-encoded-message-and-open-it-in-a-new-browser-tab-window-open-so-the-admin-owner-receives-the-notification-the-notification-flow-must-not-block-or-interfere-with-the-customer-s-order-confirmation-redirect",
+      "title": "When a new order is successfully placed via the placeOrder backend function, immediately trigger a WhatsApp notification to the number 9137202881 (formatted as +919137202881) by opening a pre-filled WhatsApp message URL. The notification must be sent from the frontend immediately after a successful order placement (i.e., after the placeOrder mutation resolves successfully). The message must include: Order ID, buyer's full name, country, phone number, address, a list of all ordered items (product name and quantity for each), the order total in € (Euro), and the order timestamp. Construct the WhatsApp deep-link URL as https://wa.me/919137202881?text=<URL-encoded message> and open it in a new browser tab (window.open) so the admin/owner receives the notification. The notification flow must not block or interfere with the customer's order confirmation redirect.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -165,6 +249,76 @@
     {
       "id": "AR-13",
       "summary": "Add a Contact page with phone number 9137202881 (linked to WhatsApp) and email ashokgold664@gmail.com (linked via mailto), both clickable.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Audit and update the backend seeded product data so that all sample products have imageUrl values set to real, publicly accessible HTTP/HTTPS image URLs (not empty strings, relative paths, or placeholder text). Ensure any existing seeded products in the stable store are migrated to use valid HTTP image URLs.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Audit all seeded products in the backend stable store and ensure every product has a valid, publicly accessible HTTP/HTTPS imageUrl. Update the migration.mo file to replace any empty, relative, or non-HTTP imageUrl values with real publicly accessible image URLs for gold jewelry/coins/decorative items. Verify that the migration hook runs on canister upgrade so existing stored products are updated.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Audit the backend seeded products in main.mo and migration.mo to confirm every product's imageUrl is a valid, publicly accessible HTTPS URL for a gold-related product image. Replace any empty, placeholder, or broken URLs with working public image URLs. Ensure the migration runs on canister upgrade so all existing stored products are updated with valid imageUrls.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Use the provided example image URL (https://instasize.com/p/3b0f2f36d686b0a85d541d14f34b4670f27674596be914e9076b0004b6bbac6f) as a sample product imageUrl to test and fix image rendering in the shop/product pages.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Update all seeded products in backend/main.mo and backend/migration.mo to use the example image URL (https://instasize.com/p/3b0f2f36d686b0a85d541d14f34b4670f27674596be914e9076b0004b6bbac6f) as their imageUrl value for any product that currently has an empty, placeholder, broken, or non-HTTP imageUrl. Ensure the migration runs on canister upgrade so existing stored products in stable state are also updated with this working imageUrl.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Allow admin to upload product images directly from their device's photo library (file upload input) instead of entering an image URL manually, when adding products via the admin panel.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Update the backend addProduct function in main.mo to accept imageUrl values that are Base64 data URL strings (i.e., strings beginning with 'data:image/') in addition to HTTP/HTTPS URLs. Do not apply any URL validation that would reject Base64 data URLs. Ensure the migration.mo replacement logic does not overwrite valid Base64 data URL imageUrls with the fallback URL.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "In the admin panel's Orders section, add an order status bar/progress indicator per order (showing current status: Pending, Processing, Shipped, Delivered, Cancelled), and display a thumbnail photo of each product the customer ordered alongside the order line items.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Redesign the Home page layout to be more professional and visually bright, with a polished, premium look consistent with the site's gold-accent bright theme.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Send a WhatsApp notification to 9137202881 with full order details (order ID, buyer info, items list, total, timestamp) whenever a new order is placed.",
       "reqIds": [],
       "status": "pending"
     }

@@ -1,40 +1,46 @@
 {
   "kind": "build_request",
-  "title": "Add Contact page with WhatsApp and email links",
+  "title": "WhatsApp notification on new order placement",
   "projectName": "Bessie's Ashok Gold",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-14",
-      "text": "Create a new Contact page at route /contact in the frontend. The page must display the phone number 9137202881 as a clickable WhatsApp link (https://wa.me/919137202881) and the email address ashokgold664@gmail.com as a clickable mailto link (mailto:ashokgold664@gmail.com). Both links must be prominently styled using the site's existing bright gold-accent theme (gold borders, gold text on hover, cream/ivory background). The page should include clear labels (e.g., 'WhatsApp Us' and 'Email Us') with appropriate icons or visual indicators to differentiate the two contact methods.",
+      "id": "REQ-29",
+      "text": "When a new order is successfully placed via the placeOrder backend function, immediately trigger a WhatsApp notification to the number 9137202881 (formatted as +919137202881) by opening a pre-filled WhatsApp message URL. The notification must be sent from the frontend immediately after a successful order placement (i.e., after the placeOrder mutation resolves successfully). The message must include: Order ID, buyer's full name, country, phone number, address, a list of all ordered items (product name and quantity for each), the order total in € (Euro), and the order timestamp. Construct the WhatsApp deep-link URL as https://wa.me/919137202881?text=<URL-encoded message> and open it in a new browser tab (window.open) so the admin/owner receives the notification. The notification flow must not block or interfere with the customer's order confirmation redirect.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-recent"
         ],
         "quotes": [
-          "give a page with a contact and email 9137202881 ashokgold664@gmail.com link them to WhatsApp and email"
+          "Send me a notification with full order details and items list whenever a new order is place and I want a notification on my number or WhatsApp 9137202881"
         ]
       },
       "acceptanceCriteria": [
-        "A /contact route is registered in App.tsx and renders the Contact page.",
-        "The phone number 9137202881 is displayed and clicking it opens WhatsApp via https://wa.me/919137202881 in a new tab.",
-        "The email ashokgold664@gmail.com is displayed and clicking it opens the default email client via mailto:ashokgold664@gmail.com.",
-        "The page uses the site's bright cream/ivory background and gold accent colors consistent with the existing theme.",
-        "A 'Contact' link is added to the Navigation bar (desktop and mobile menus) pointing to /contact.",
-        "A 'Contact' link is added to the Footer's quick navigation links pointing to /contact."
+        "After a customer successfully places an order, a new browser tab opens with a pre-filled WhatsApp message to +919137202881.",
+        "The WhatsApp message includes the Order ID.",
+        "The WhatsApp message includes the buyer's full name, country, phone number, and address.",
+        "The WhatsApp message includes a list of all ordered items with product name and quantity for each item.",
+        "The WhatsApp message includes the order total formatted with the Euro (€) symbol.",
+        "The WhatsApp message includes the order timestamp.",
+        "Opening the WhatsApp notification tab does not block the customer from being redirected to the Order Confirmation page.",
+        "The notification is triggered inside the onSuccess callback of the placeOrder mutation in Cart.tsx (or useQueries.ts), after the order is confirmed."
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Do not change any backend logic — this is a frontend-only addition.",
-    "WhatsApp link must use the international format with country code 91 (India): https://wa.me/919137202881."
+    "Do not use any third-party SMS, email, or push notification services.",
+    "Do not modify backend/main.mo for this feature — the notification is purely a frontend concern triggered after a successful placeOrder mutation.",
+    "The WhatsApp notification must target exactly +919137202881 (wa.me/919137202881).",
+    "Do not block or replace the existing order confirmation page redirect flow."
   ],
   "nonGoals": [
-    "No contact form or message submission functionality.",
-    "No backend storage of contact inquiries.",
-    "No third-party integrations beyond the WhatsApp deep link and mailto protocol."
+    "Server-side or backend-triggered notifications.",
+    "Email notifications.",
+    "SMS notifications via Twilio or any other SMS service.",
+    "Push notifications.",
+    "Storing notification logs in the backend.",
+    "Requiring the customer to send the WhatsApp message themselves — the tab should open automatically."
   ],
   "imageRequirements": {
     "required": [],

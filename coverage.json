@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T10:54:42.940Z",
+  "generatedAt": "2026-03-01T17:54:57.976Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,20 +11,15 @@
     "implemented": 1,
     "items": [
       {
-        "id": "REQ-14",
-        "summary": "Create a new Contact page at route /contact in the frontend. The page must display the phone number 9137202881 as a clickable WhatsApp link (https://wa.me/919137202881) and the email address ashokgold664@gmail.com as a clickable mailto link (mailto:ashokgold664@gmail.com). Both links must be prominently styled using the site's existing bright gold-accent theme (gold borders, gold text on hover, cream/ivory background). The page should include clear labels (e.g., 'WhatsApp Us' and 'Email Us') with appropriate icons or visual indicators to differentiate the two contact methods.",
+        "id": "REQ-29",
+        "summary": "When a new order is successfully placed via the placeOrder backend function, immediately trigger a WhatsApp notification to the number 9137202881 (formatted as +919137202881) by opening a pre-filled WhatsApp message URL. The notification must be sent from the frontend immediately after a successful order placement (i.e., after the placeOrder mutation resolves successfully). The message must include: Order ID, buyer's full name, country, phone number, address, a list of all ordered items (product name and quantity for each), the order total in € (Euro), and the order timestamp. Construct the WhatsApp deep-link URL as https://wa.me/919137202881?text=<URL-encoded message> and open it in a new browser tab (window.open) so the admin/owner receives the notification. The notification flow must not block or interfere with the customer's order confirmation redirect.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Contact.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Navigation.tsx",
-          "frontend/src/components/Footer.tsx"
+          "frontend/src/utils/whatsapp.ts",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Contact.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Navigation.tsx",
-          "frontend/src/components/Footer.tsx"
+          "frontend/src/utils/whatsapp.ts"
         ]
       }
     ]
@@ -34,10 +29,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/components/Navigation.tsx",
-    "frontend/src/pages/Contact.tsx",
+    "frontend/src/pages/Cart.tsx",
+    "frontend/src/utils/whatsapp.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

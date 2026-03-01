@@ -1,11 +1,9 @@
-import Array "mo:core/Array";
-import Text "mo:core/Text";
 import Iter "mo:core/Iter";
 import Map "mo:core/Map";
+import Array "mo:core/Array";
+import Text "mo:core/Text";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
-
-
 
 actor {
   type Product = {

@@ -1,24 +1,11 @@
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { ShoppingCart, Eye } from 'lucide-react';
+import { ShoppingCart, Eye, ImageOff } from 'lucide-react';
 import type { Product } from '@/backend';
 import { useCart } from '@/hooks/useCart';
 import { useAddToCart } from '@/hooks/useQueries';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-
-const CATEGORY_IMAGES: Record<string, string> = {
-  Jewelry: '/assets/generated/product-jewelry.dim_400x400.png',
-  Collectibles: '/assets/generated/product-coin.dim_400x400.png',
-  Investments: '/assets/generated/product-coin.dim_400x400.png',
-  Accessories: '/assets/generated/product-decor.dim_400x400.png',
-};
-
-function getProductImage(product: Product): string {
-  if (product.imageUrl && !product.imageUrl.includes('placeholder.com')) {
-    return product.imageUrl;
-  }
-  return CATEGORY_IMAGES[product.category] || '/assets/generated/product-decor.dim_400x400.png';
-}
 
 interface ProductCardProps {
   product: Product;
@@ -27,6 +14,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
   const addToCartMutation = useAddToCart();
+  const [imgFailed, setImgFailed] = useState(false);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -36,8 +24,11 @@ export default function ProductCard({ product }: ProductCardProps) {
     toast.success(`${product.name} added to cart`);
   };
 
+  const handleImageError = () => {
+    setImgFailed(true);
+  };
+
   const isOutOfStock = !product.inStock;
-  const imgSrc = getProductImage(product);
 
   return (
     <div className="group relative card-dark rounded-lg overflow-hidden transition-all duration-300 hover:shadow-gold hover:-translate-y-1">
@@ -57,11 +48,21 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Image */}
       <Link to="/product/$id" params={{ id: product.id.toString() }}>
         <div className="relative overflow-hidden aspect-square bg-secondary">
-          <img
-            src={imgSrc}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          {imgFailed ? (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-secondary gap-2">
+              <ImageOff className="h-10 w-10 text-gold/40" />
+              <span className="text-[10px] font-body tracking-widest uppercase text-gold/50">
+                No Image
+              </span>
+            </div>
+          ) : (
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              onError={handleImageError}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          )}
           {isOutOfStock && (
             <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
               <span className="font-display text-xs tracking-widest uppercase text-gold/80 border border-gold/40 px-3 py-1 rounded bg-background/80">

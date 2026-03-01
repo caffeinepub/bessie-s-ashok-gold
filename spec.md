@@ -1,13 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add a Contact page to Bessie's Ashok Gold site with clickable WhatsApp and email links.
+**Goal:** Automatically send a WhatsApp notification to the shop owner (+919137202881) with full order details whenever a new order is successfully placed.
 
 **Planned changes:**
-- Create a new `/contact` route and Contact page component styled with the site's gold-accent (cream/ivory background, gold borders, gold hover text) theme
-- Display phone number 9137202881 as a clickable WhatsApp link (`https://wa.me/919137202881`) opening in a new tab, labeled "WhatsApp Us"
-- Display email ashokgold664@gmail.com as a clickable mailto link, labeled "Email Us"
-- Add a "Contact" link to the Navigation bar (desktop and mobile menus)
-- Add a "Contact" link to the Footer's quick navigation links
+- After the `placeOrder` mutation resolves successfully on the frontend, construct a pre-filled WhatsApp deep-link URL (`https://wa.me/919137202881?text=<URL-encoded message>`) containing the Order ID, buyer's full name, country, phone number, address, list of ordered items (name and quantity), order total in €, and order timestamp.
+- Open the WhatsApp deep-link in a new browser tab (`window.open`) inside the `onSuccess` callback of the `placeOrder` mutation (in `Cart.tsx` or `useQueries.ts`).
+- Ensure the WhatsApp tab opening does not block or interfere with the existing order confirmation page redirect.
 
-**User-visible outcome:** Users can navigate to a dedicated Contact page and directly reach the business via WhatsApp or email with one click.
+**User-visible outcome:** After a customer places an order, a new browser tab automatically opens with a pre-filled WhatsApp message to the shop owner containing all order details, while the customer is still redirected normally to the order confirmation page.

@@ -28,6 +28,15 @@ export default {
                     dark: 'oklch(var(--gold-dark))',
                     muted: 'oklch(var(--gold-muted))',
                 },
+                cream: {
+                    DEFAULT: 'oklch(0.97 0.010 78)',
+                    warm: 'oklch(0.96 0.014 76)',
+                    light: 'oklch(0.98 0.007 80)',
+                },
+                charcoal: {
+                    DEFAULT: 'oklch(0.18 0.01 30)',
+                    light: 'oklch(0.28 0.01 30)',
+                },
                 border: 'oklch(var(--border))',
                 input: 'oklch(var(--input))',
                 ring: 'oklch(var(--ring) / <alpha-value>)',
@@ -87,7 +96,10 @@ export default {
             boxShadow: {
                 xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
                 gold: '0 2px 16px oklch(0.65 0.13 72 / 0.22)',
-                'gold-lg': '0 4px 32px oklch(0.65 0.13 72 / 0.18)',
+                'gold-lg': '0 6px 40px oklch(0.65 0.13 72 / 0.28)',
+            },
+            scale: {
+                '108': '1.08',
             },
             keyframes: {
                 'accordion-down': {
