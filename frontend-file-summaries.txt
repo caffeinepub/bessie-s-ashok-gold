@@ -1,0 +1,20 @@
+{
+  "frontend/src/index.css": "Global styles switched to a bright light theme using OKLCH color tokens — warm cream/white backgrounds, dark charcoal foreground, gold accents preserved; card-dark utility now renders as a light card with subtle gold border.",
+  "frontend/tailwind.config.js": "Extended Tailwind config with updated gold box-shadow utilities tuned for the bright light theme.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations — updated placeOrder to accept name/country/phone/address, added useUpdateProductStock, useUpdateOrderStatus, and useCancelOrder mutations with proper cache invalidation. Removed legacy initializeStore and fixed addProduct signature to match new backend.",
+  "frontend/src/hooks/useCart.tsx": "React Context-based cart state provider with addItem, removeItem, updateQuantity, clearCart, totalItems, and subtotal — wraps children with CartProvider.",
+  "frontend/src/components/Navigation.tsx": "Sticky navigation bar with a \"Contact\" link added to both desktop and mobile menus, alongside Home, Shop, and Admin links with gold hover/active states.",
+  "frontend/src/components/ProductCard.tsx": "Product card with bright light card background, dark charcoal text, gold price display in € format, and white text on gold buttons.",
+  "frontend/src/components/CartItem.tsx": "Cart item row showing product details with € price formatting for both unit price and line subtotal, updated for bright theme.",
+  "frontend/src/components/Footer.tsx": "Site footer with a \"Contact\" link added to the Quick Links section, alongside Home, Shop, Cart, and Admin Panel links.",
+  "frontend/src/pages/Home.tsx": "Home page hero, trust badges, featured products, and CTA banner updated for bright theme with white/cream backgrounds and gold accents.",
+  "frontend/src/pages/Shop.tsx": "Shop page with bright theme styling and price range filters updated to use € currency labels.",
+  "frontend/src/pages/ProductDetail.tsx": "Product detail page with bright theme, € price display, and white text on gold action buttons.",
+  "frontend/src/pages/Cart.tsx": "Cart page with bright theme, all prices displayed in € format, and updated placeholder text for European context.",
+  "frontend/src/pages/OrderConfirmation.tsx": "Order confirmation page with bright theme, order total displayed in € format, and white text on gold buttons.",
+  "frontend/src/App.tsx": "Root app component with TanStack Router setup including all routes (/, /shop, /product/:id, /cart, /order-confirmation/:orderId, /admin, /contact), CartProvider, and Toaster.",
+  "frontend/src/pages/Admin.tsx": "Full admin panel with bright theme throughout — product and order tables show all prices/totals in € format with updated column headers.",
+  "frontend/src/components/AdminPasswordGate.tsx": "Admin lock screen and session bar updated for bright theme with light card background and gold accent button.",
+  "frontend/src/components/OrderStatusTracker.tsx": "Visual order status stepper with bright backgrounds, gold active/completed steps, and white checkmarks on gold circles.",
+  "frontend/src/pages/Contact.tsx": "New Contact page displaying WhatsApp (https://wa.me/919137202881) and email (ashokgold664@gmail.com) contact cards with gold-themed styling, icons, and prominent call-to-action buttons."
+}

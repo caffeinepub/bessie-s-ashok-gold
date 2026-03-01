@@ -1,0 +1,176 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 11,
+  "summary": "E-commerce website for 'Bessie's Ashok Gold' brand/product.",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-build-a-multi-page-frontend-for-the-bessie-s-ashok-gold-e-commerce-store-with-the-following-pages-home-hero-banner-featured-products-shop-all-products-product-grid-with-filters-by-category-and-price-product-detail-image-description-price-add-to-cart-button-shopping-cart-list-of-items-quantity-controls-subtotal-checkout-button-and-order-confirmation-page",
+      "title": "Build a multi-page frontend for the Bessie's Ashok Gold e-commerce store with the following pages: Home (hero banner, featured products), Shop/All Products (product grid with filters by category and price), Product Detail (image, description, price, add-to-cart button), Shopping Cart (list of items, quantity controls, subtotal, checkout button), and Order Confirmation page.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-luxurious-gold-and-deep-black-visual-theme-throughout-the-site-to-reflect-the-premium-ashok-gold-brand-identity-use-rich-gold-c9a84c-or-similar-warm-gold-deep-charcoal-or-near-black-backgrounds-elegant-serif-or-high-contrast-display-typography-for-headings-and-refined-card-layouts-with-subtle-golden-borders-and-hover-effects-keep-the-design-consistent-across-all-pages",
+      "title": "Apply a luxurious gold and deep-black visual theme throughout the site to reflect the premium 'Ashok Gold' brand identity. Use rich gold (#C9A84C or similar warm gold), deep charcoal or near-black backgrounds, elegant serif or high-contrast display typography for headings, and refined card layouts with subtle golden borders and hover effects. Keep the design consistent across all pages.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-protected-admin-panel-page-at-route-admin-in-the-frontend-the-page-must-include-1-a-product-management-section-with-a-form-to-add-a-new-product-name-description-price-imageurl-category-stock-quantity-a-product-list-table-showing-all-current-products-with-delete-buttons-and-inline-price-editing-and-2-an-orders-section-listing-all-orders-with-order-id-buyer-name-items-purchased-total-amount-status-and-timestamp",
+      "title": "Create a protected Admin Panel page at route /admin in the frontend. The page must include: (1) a product management section with a form to add a new product (name, description, price, imageUrl, category, stock quantity), a product list table showing all current products with delete buttons and inline price editing, and (2) an orders section listing all orders with order ID, buyer name, items purchased, total amount, status, and timestamp.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-react-query-hooks-in-usequeries-ts-to-wire-the-frontend-admin-panel-to-the-backend-hooks-for-addproduct-deleteproduct-updateproductprice-mutations-and-a-getallorders-query-mutations-should-invalidate-the-products-and-orders-query-caches-on-success",
+      "title": "Add React Query hooks in useQueries.ts to wire the frontend Admin Panel to the backend: hooks for addProduct, deleteProduct, updateProductPrice mutations, and a getAllOrders query. Mutations should invalidate the products and orders query caches on success.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-password-protect-the-admin-panel-at-route-admin-with-the-password-vivek-1870-when-a-user-navigates-to-admin-show-a-password-entry-screen-only-grant-access-to-the-admin-dashboard-after-the-correct-password-is-entered-store-the-authenticated-state-in-session-local-storage-so-the-user-is-not-re-prompted-on-page-refresh-within-the-same-session-display-an-error-message-on-incorrect-password-attempts",
+      "title": "Password-protect the Admin Panel at route /admin with the password 'vivek@1870'. When a user navigates to /admin, show a password entry screen. Only grant access to the admin dashboard after the correct password is entered. Store the authenticated state in session/local storage so the user is not re-prompted on page refresh within the same session. Display an error message on incorrect password attempts.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-stock-status-toggle-in-stock-out-of-stock-to-the-backend-product-type-and-expose-an-admin-function-updateproductstock-id-instock-bool-update-the-admin-panel-product-table-to-include-a-toggle-bar-indicator-allowing-the-admin-to-mark-any-product-as-in-stock-or-out-of-stock-display-the-stock-status-prominently-on-product-cards-shop-page-the-product-detail-page-and-the-cart-page-showing-a-gold-in-stock-badge-or-a-red-grey-out-of-stock-badge-per-product",
+      "title": "Add a stock status toggle (In Stock / Out of Stock) to the backend Product type and expose an admin function updateProductStock(id, inStock: Bool). Update the admin panel product table to include a toggle/bar indicator allowing the admin to mark any product as in stock or out of stock. Display the stock status prominently on product cards (Shop page), the Product Detail page, and the Cart page — showing a gold 'In Stock' badge or a red/grey 'Out of Stock' badge per product.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-order-status-management-feature-to-the-backend-and-admin-panel-the-backend-order-type-should-support-statuses-pending-processing-shipped-delivered-cancelled-expose-a-backend-function-updateorderstatus-orderid-newstatus-and-cancelorder-orderid-in-the-admin-panel-orders-section-add-a-status-dropdown-selector-per-order-to-update-its-status-and-a-cancel-order-button-that-sets-the-order-status-to-cancelled-on-the-customer-facing-order-confirmation-page-display-a-visual-order-status-tracker-progress-bar-showing-the-current-status-of-the-order",
+      "title": "Add an order status management feature to the backend and admin panel. The backend Order type should support statuses: Pending, Processing, Shipped, Delivered, Cancelled. Expose a backend function updateOrderStatus(orderId, newStatus) and cancelOrder(orderId). In the admin panel orders section, add a status dropdown/selector per order to update its status, and a 'Cancel Order' button that sets the order status to Cancelled. On the customer-facing Order Confirmation page, display a visual order status tracker/progress bar showing the current status of the order.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-on-the-cart-checkout-page-before-an-order-can-be-placed-require-the-customer-to-complete-a-form-collecting-full-name-country-phone-number-and-address-the-form-must-be-validated-all-fields-required-before-the-checkout-place-order-action-is-enabled-submit-these-details-as-the-buyer-information-when-placing-the-order-via-the-backend-placeorder-function-ensure-the-backend-order-type-stores-these-customer-details-name-country-phone-address",
+      "title": "On the Cart/Checkout page, before an order can be placed, require the customer to complete a form collecting: Full Name, Country, Phone Number, and Address. The form must be validated (all fields required) before the checkout/place order action is enabled. Submit these details as the buyer information when placing the order via the backend placeOrder function. Ensure the backend Order type stores these customer details (name, country, phone, address).",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-retheme-the-entire-site-to-a-bright-light-color-scheme-replace-the-current-dark-near-black-backgrounds-with-bright-whites-and-warm-cream-ivory-tones-e-g-fffdf5-fff8e7-replace-dark-card-backgrounds-with-white-or-very-light-gold-tinted-surfaces-update-text-colors-to-deep-charcoal-1a1a1a-2d2d2d-for-readability-retain-gold-c9a84c-as-an-accent-color-for-borders-buttons-badges-and-highlights-update-tailwind-css-custom-properties-in-frontend-src-index-css-and-tailwind-config-js-to-reflect-the-new-bright-palette-ensure-the-navigation-bar-footer-hero-section-product-cards-cart-admin-panel-order-confirmation-and-all-other-pages-consistently-use-the-bright-theme",
+      "title": "Retheme the entire site to a bright, light color scheme. Replace the current dark/near-black backgrounds with bright whites and warm cream/ivory tones (e.g., #FFFDF5, #FFF8E7). Replace dark card backgrounds with white or very light gold-tinted surfaces. Update text colors to deep charcoal (#1A1A1A, #2D2D2D) for readability. Retain gold (#C9A84C) as an accent color for borders, buttons, badges, and highlights. Update Tailwind CSS custom properties in frontend/src/index.css and tailwind.config.js to reflect the new bright palette. Ensure the Navigation bar, Footer, Hero section, Product cards, Cart, Admin Panel, Order Confirmation, and all other pages consistently use the bright theme.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-change-all-price-displays-across-the-entire-site-from-their-current-format-to-euro-currency-prepend-the-euro-symbol-to-every-price-value-shown-to-customers-this-includes-product-cards-shop-page-and-home-featured-products-product-detail-page-cart-line-item-prices-and-subtotal-order-confirmation-page-order-total-and-the-admin-panel-product-price-fields-and-order-totals-do-not-change-any-backend-price-storage-prices-remain-as-numbers-only-update-the-frontend-display-formatting",
+      "title": "Change all price displays across the entire site from their current format to Euro currency. Prepend the Euro symbol (€) to every price value shown to customers. This includes product cards (Shop page and Home featured products), Product Detail page, Cart line item prices and subtotal, Order Confirmation page order total, and the Admin Panel product price fields and order totals. Do not change any backend price storage — prices remain as numbers; only update the frontend display formatting.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-contact-page-at-route-contact-in-the-frontend-the-page-must-display-the-phone-number-9137202881-as-a-clickable-whatsapp-link-https-wa-me-919137202881-and-the-email-address-ashokgold664-gmail-com-as-a-clickable-mailto-link-mailto-ashokgold664-gmail-com-both-links-must-be-prominently-styled-using-the-site-s-existing-bright-gold-accent-theme-gold-borders-gold-text-on-hover-cream-ivory-background-the-page-should-include-clear-labels-e-g-whatsapp-us-and-email-us-with-appropriate-icons-or-visual-indicators-to-differentiate-the-two-contact-methods",
+      "title": "Create a new Contact page at route /contact in the frontend. The page must display the phone number 9137202881 as a clickable WhatsApp link (https://wa.me/919137202881) and the email address ashokgold664@gmail.com as a clickable mailto link (mailto:ashokgold664@gmail.com). Both links must be prominently styled using the site's existing bright gold-accent theme (gold borders, gold text on hover, cream/ivory background). The page should include clear labels (e.g., 'WhatsApp Us' and 'Email Us') with appropriate icons or visual indicators to differentiate the two contact methods.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "E-commerce website for Bessie's Ashok Gold",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Create a backend actor with stable data structures to manage products (id, name, description, price, imageUrl, category, stock quantity), orders (id, buyer details, items, total, status, timestamp), and a shopping cart per session. Expose functions to list products, get product by ID, add/update/remove products (admin), place an order, and retrieve orders.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Seed the backend with at least 6 sample gold-related products (e.g., gold jewelry, gold coins, gold decorative items) with placeholder image URLs, descriptions, prices, categories, and stock quantities so the storefront is populated on first load.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Build an admin panel where the admin can add new products, delete existing products, update product prices, and view all orders.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Extend the backend actor to expose admin functions: addProduct (name, description, price, imageUrl, category, stock), deleteProduct (by ID), updateProductPrice (by ID, new price), and getAllOrders (returns all placed orders with buyer details, items, total, status, and timestamp).",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Password protect the admin panel with password 'vivek@1870'.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Add a stock status indicator (In Stock / Out of Stock) visible to customers on product listings and detail pages, and allow admin to toggle stock status per product.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add an order status bar/tracker visible to customers, an order status management option in the admin panel, and the ability for admin to cancel any order.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "When a customer places an order (checkout), require them to fill a form with their name, country, phone number, and address before the order is confirmed.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Make the website visually bright (light/bright color theme instead of dark) and display all prices in Euro (€) currency.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add a Contact page with phone number 9137202881 (linked to WhatsApp) and email ashokgold664@gmail.com (linked via mailto), both clickable.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Bessie's Ashok Gold",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

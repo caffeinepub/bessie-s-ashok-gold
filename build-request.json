@@ -1,0 +1,43 @@
+{
+  "kind": "build_request",
+  "title": "Add Contact page with WhatsApp and email links",
+  "projectName": "Bessie's Ashok Gold",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "text": "Create a new Contact page at route /contact in the frontend. The page must display the phone number 9137202881 as a clickable WhatsApp link (https://wa.me/919137202881) and the email address ashokgold664@gmail.com as a clickable mailto link (mailto:ashokgold664@gmail.com). Both links must be prominently styled using the site's existing bright gold-accent theme (gold borders, gold text on hover, cream/ivory background). The page should include clear labels (e.g., 'WhatsApp Us' and 'Email Us') with appropriate icons or visual indicators to differentiate the two contact methods.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "give a page with a contact and email 9137202881 ashokgold664@gmail.com link them to WhatsApp and email"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A /contact route is registered in App.tsx and renders the Contact page.",
+        "The phone number 9137202881 is displayed and clicking it opens WhatsApp via https://wa.me/919137202881 in a new tab.",
+        "The email ashokgold664@gmail.com is displayed and clicking it opens the default email client via mailto:ashokgold664@gmail.com.",
+        "The page uses the site's bright cream/ivory background and gold accent colors consistent with the existing theme.",
+        "A 'Contact' link is added to the Navigation bar (desktop and mobile menus) pointing to /contact.",
+        "A 'Contact' link is added to the Footer's quick navigation links pointing to /contact."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Do not change any backend logic — this is a frontend-only addition.",
+    "WhatsApp link must use the international format with country code 91 (India): https://wa.me/919137202881."
+  ],
+  "nonGoals": [
+    "No contact form or message submission functionality.",
+    "No backend storage of contact inquiries.",
+    "No third-party integrations beyond the WhatsApp deep link and mailto protocol."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

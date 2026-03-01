@@ -1,0 +1,41 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Add Contact page with WhatsApp and email links",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "summary": "Create a /contact page with WhatsApp and email contact links styled with the site's gold theme",
+      "acceptanceCriteria": [
+        "A /contact route is registered in App.tsx and renders the Contact page.",
+        "The phone number 9137202881 is displayed and clicking it opens WhatsApp via https://wa.me/919137202881 in a new tab.",
+        "The email ashokgold664@gmail.com is displayed and clicking it opens the default email client via mailto:ashokgold664@gmail.com.",
+        "The page uses the site's bright cream/ivory background and gold accent colors consistent with the existing theme.",
+        "A 'Contact' link is added to the Navigation bar (desktop and mobile menus) pointing to /contact.",
+        "A 'Contact' link is added to the Footer's quick navigation links pointing to /contact."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Contact.tsx",
+          "operation": "create",
+          "description": "Create Contact page component that displays the phone number 9137202881 as a WhatsApp link (https://wa.me/919137202881) and email ashokgold664@gmail.com as a mailto link. Style both contact methods prominently with gold borders, gold hover effects, and cream/ivory backgrounds using Tailwind classes that match the existing site theme. Include clear labels ('WhatsApp Us' and 'Email Us') with visual indicators to differentiate the two methods. Ensure links open in appropriate contexts (WhatsApp in new tab, email in default client)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register the /contact route in the TanStack Router configuration to render the Contact page component. Add the route alongside existing routes (home, shop, product detail, cart, order confirmation, admin)."
+        },
+        {
+          "path": "frontend/src/components/Navigation.tsx",
+          "operation": "modify",
+          "description": "Add a 'Contact' navigation link pointing to /contact in both the desktop navigation menu and the mobile navigation menu. Place it logically within the existing menu structure (after Home/Shop, before Admin) and ensure it uses the same styling and active state indicators as other navigation items."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Add a 'Contact' link pointing to /contact in the Footer's quick navigation links section. Ensure it matches the styling and hover effects of existing footer links and is placed logically within the navigation group."
+        }
+      ]
+    }
+  ]
+}
