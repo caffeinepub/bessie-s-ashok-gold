@@ -24,13 +24,19 @@ export default function CartItemComponent({
   };
 
   return (
-    <div className="flex gap-4 p-4 card-dark rounded-lg">
+    <div className="flex gap-4 p-4 bg-white rounded-lg border-2 border-black/12 shadow-sm">
       {/* Image */}
-      <div className="w-20 h-20 shrink-0 rounded overflow-hidden bg-secondary">
+      <div
+        className="w-20 h-20 shrink-0 rounded overflow-hidden"
+        style={{ backgroundColor: "oklch(0.96 0.03 84)" }}
+      >
         {imgFailed ? (
-          <div className="w-full h-full flex flex-col items-center justify-center bg-secondary gap-1">
-            <ImageOff className="h-6 w-6 text-gold/30" />
-            <span className="text-[8px] font-body tracking-widest uppercase text-gold/40">
+          <div
+            className="w-full h-full flex flex-col items-center justify-center gap-1"
+            style={{ backgroundColor: "oklch(0.96 0.03 84)" }}
+          >
+            <ImageOff className="h-6 w-6 text-black/25" />
+            <span className="text-[8px] font-body tracking-widest uppercase text-black/35 font-semibold">
               No Image
             </span>
           </div>
@@ -48,21 +54,22 @@ export default function CartItemComponent({
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <span className="text-[10px] font-body tracking-widest uppercase text-gold/70">
+            <span className="text-[10px] font-body tracking-widest uppercase text-black/45 font-bold">
               {product.category}
             </span>
-            <h3 className="font-display text-sm font-medium text-foreground truncate">
+            <h3 className="font-display text-sm font-bold text-black truncate">
               {product.name}
             </h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-xs text-black/55 mt-0.5 font-semibold">
               {convertPrice(product.price)} each
             </p>
           </div>
           <button
             type="button"
             onClick={() => onRemove(product.id)}
-            className="p-1.5 text-muted-foreground hover:text-destructive transition-colors shrink-0"
+            className="p-1.5 text-black/40 hover:text-destructive transition-colors shrink-0"
             aria-label="Remove item"
+            data-ocid="cart.item.delete_button"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -70,28 +77,31 @@ export default function CartItemComponent({
 
         {/* Quantity + Subtotal */}
         <div className="flex items-center justify-between mt-3">
-          <div className="flex items-center gap-2 border border-gold/20 rounded overflow-hidden bg-background">
+          <div
+            className="flex items-center gap-2 border-2 border-black/15 rounded overflow-hidden"
+            style={{ backgroundColor: "oklch(0.96 0.03 84)" }}
+          >
             <button
               type="button"
               onClick={() => onUpdateQuantity(product.id, quantity - 1)}
-              className="p-1.5 hover:bg-gold/10 text-foreground/60 hover:text-gold transition-colors"
+              className="p-1.5 hover:bg-black/10 text-black/60 hover:text-black transition-colors"
               aria-label="Decrease quantity"
             >
               <Minus className="h-3 w-3" />
             </button>
-            <span className="px-3 py-1 text-sm font-body text-foreground min-w-[2rem] text-center">
+            <span className="px-3 py-1 text-sm font-body text-black min-w-[2rem] text-center font-bold">
               {quantity}
             </span>
             <button
               type="button"
               onClick={() => onUpdateQuantity(product.id, quantity + 1)}
-              className="p-1.5 hover:bg-gold/10 text-foreground/60 hover:text-gold transition-colors"
+              className="p-1.5 hover:bg-black/10 text-black/60 hover:text-black transition-colors"
               aria-label="Increase quantity"
             >
               <Plus className="h-3 w-3" />
             </button>
           </div>
-          <span className="font-serif text-base font-semibold text-gold">
+          <span className="font-serif text-base font-bold text-gold">
             {convertPrice(subtotal)}
           </span>
         </div>

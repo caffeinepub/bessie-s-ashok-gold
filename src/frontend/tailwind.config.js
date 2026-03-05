@@ -16,10 +16,10 @@ export default {
         },
         extend: {
             fontFamily: {
-                display: ['Cinzel', 'serif'],
-                serif: ['Cormorant Garamond', 'serif'],
-                body: ['Inter', 'sans-serif'],
-                sans: ['Inter', 'sans-serif'],
+                display: ['Playfair Display', 'serif'],
+                serif: ['Playfair Display', 'serif'],
+                body: ['Bricolage Grotesque', 'sans-serif'],
+                sans: ['Bricolage Grotesque', 'sans-serif'],
             },
             colors: {
                 gold: {
@@ -29,13 +29,17 @@ export default {
                     muted: 'oklch(var(--gold-muted))',
                 },
                 cream: {
-                    DEFAULT: 'oklch(0.97 0.010 78)',
-                    warm: 'oklch(0.96 0.014 76)',
-                    light: 'oklch(0.98 0.007 80)',
+                    DEFAULT: 'oklch(0.97 0.03 85)',
+                    warm: 'oklch(0.95 0.04 82)',
+                    light: 'oklch(0.99 0.015 88)',
                 },
                 charcoal: {
-                    DEFAULT: 'oklch(0.18 0.01 30)',
-                    light: 'oklch(0.28 0.01 30)',
+                    DEFAULT: 'oklch(0.1 0 0)',
+                    light: 'oklch(0.25 0 0)',
+                },
+                amber: {
+                    bright: 'oklch(0.88 0.16 82)',
+                    vivid: 'oklch(0.82 0.18 78)',
                 },
                 border: 'oklch(var(--border))',
                 input: 'oklch(var(--input))',

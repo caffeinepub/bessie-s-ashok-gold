@@ -86,10 +86,10 @@ function OrderStatusTracker({ status }: { status: OrderStatus }) {
                 <div
                   className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all ${
                     isCompleted
-                      ? "bg-gold border-gold"
+                      ? "bg-black border-black"
                       : isActive
                         ? "bg-gold border-gold shadow-md shadow-gold/40"
-                        : "bg-background border-border"
+                        : "bg-white border-black/20"
                   }`}
                 >
                   {isCompleted ? (
@@ -98,15 +98,13 @@ function OrderStatusTracker({ status }: { status: OrderStatus }) {
                     <div className="w-2.5 h-2.5 rounded-full bg-white" />
                   ) : (
                     <div
-                      className={`w-2 h-2 rounded-full ${isPending ? "bg-muted-foreground/30" : ""}`}
+                      className={`w-2 h-2 rounded-full ${isPending ? "bg-black/20" : ""}`}
                     />
                   )}
                 </div>
                 <span
-                  className={`text-[10px] font-medium whitespace-nowrap ${
-                    isCompleted || isActive
-                      ? "text-gold"
-                      : "text-muted-foreground"
+                  className={`text-[10px] font-semibold whitespace-nowrap ${
+                    isCompleted || isActive ? "text-black" : "text-black/40"
                   }`}
                 >
                   {step.label}
@@ -117,7 +115,7 @@ function OrderStatusTracker({ status }: { status: OrderStatus }) {
               {index < STATUS_STEPS.length - 1 && (
                 <div
                   className={`flex-1 h-0.5 mx-1 mb-4 rounded-full transition-all ${
-                    index < currentIndex ? "bg-gold" : "bg-border"
+                    index < currentIndex ? "bg-black" : "bg-black/15"
                   }`}
                 />
               )}
@@ -139,8 +137,11 @@ function ProductThumbnail({
 
   if (!imageUrl || imgError) {
     return (
-      <div className="w-12 h-12 rounded-lg border border-gold/20 bg-gold/5 flex items-center justify-center flex-shrink-0">
-        <ImageOff className="w-5 h-5 text-gold/40" />
+      <div
+        className="w-12 h-12 rounded-lg border border-black/15 flex items-center justify-center flex-shrink-0"
+        style={{ backgroundColor: "oklch(0.93 0.08 84)" }}
+      >
+        <ImageOff className="w-5 h-5 text-black/30" />
       </div>
     );
   }
@@ -149,7 +150,7 @@ function ProductThumbnail({
     <img
       src={imageUrl}
       alt={name}
-      className="w-12 h-12 rounded-lg object-cover border border-gold/20 flex-shrink-0"
+      className="w-12 h-12 rounded-lg object-cover border border-black/15 flex-shrink-0"
       onError={() => setImgError(true)}
     />
   );
@@ -292,27 +293,46 @@ function AdminContent() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-background">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+    >
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Admin Panel</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-3xl font-bold text-black font-display">
+            Admin Panel
+          </h1>
+          <p className="text-black/60 mt-1 font-body font-semibold">
             Manage your products and orders
           </p>
         </div>
 
         <Tabs defaultValue="products">
-          <TabsList className="mb-6">
-            <TabsTrigger value="products" className="flex items-center gap-2">
+          <TabsList
+            className="mb-6"
+            style={{ backgroundColor: "oklch(0.93 0.08 84)" }}
+          >
+            <TabsTrigger
+              value="products"
+              data-ocid="admin.products.tab"
+              className="flex items-center gap-2 text-black data-[state=active]:bg-black data-[state=active]:text-white font-semibold"
+            >
               <Package className="w-4 h-4" />
               Products
             </TabsTrigger>
-            <TabsTrigger value="orders" className="flex items-center gap-2">
+            <TabsTrigger
+              value="orders"
+              data-ocid="admin.orders.tab"
+              className="flex items-center gap-2 text-black data-[state=active]:bg-black data-[state=active]:text-white font-semibold"
+            >
               <ShoppingBag className="w-4 h-4" />
               Orders
               {orders.length > 0 && (
-                <Badge variant="secondary" className="ml-1 text-xs">
+                <Badge
+                  variant="secondary"
+                  className="ml-1 text-xs bg-amber-200 text-black font-bold"
+                >
                   {orders.length}
                 </Badge>
               )}
@@ -323,9 +343,9 @@ function AdminContent() {
           <TabsContent value="products">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Add Product Form */}
-              <Card className="lg:col-span-1 border-gold/20">
+              <Card className="lg:col-span-1 border-2 border-black/15 bg-white shadow-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
+                  <CardTitle className="flex items-center gap-2 text-lg text-black font-bold font-display">
                     <Plus className="w-5 h-5 text-gold" />
                     Add Product
                   </CardTitle>
@@ -338,6 +358,8 @@ function AdminContent() {
                       onChange={(e) =>
                         setNewProduct((p) => ({ ...p, name: e.target.value }))
                       }
+                      data-ocid="admin.product.name.input"
+                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
                       required
                     />
                     <Input
@@ -349,6 +371,8 @@ function AdminContent() {
                           description: e.target.value,
                         }))
                       }
+                      data-ocid="admin.product.description.input"
+                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
                     />
                     <Input
                       placeholder="Price (€) *"
@@ -358,6 +382,8 @@ function AdminContent() {
                       onChange={(e) =>
                         setNewProduct((p) => ({ ...p, price: e.target.value }))
                       }
+                      data-ocid="admin.product.price.input"
+                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
                       required
                     />
                     <Input
@@ -369,6 +395,8 @@ function AdminContent() {
                           category: e.target.value,
                         }))
                       }
+                      data-ocid="admin.product.category.input"
+                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
                     />
 
                     {/* Image input mode toggle */}
@@ -381,10 +409,11 @@ function AdminContent() {
                         }
                         className={
                           imageInputMode === "upload"
-                            ? "bg-gold text-white hover:bg-gold/90"
-                            : ""
+                            ? "bg-black text-white hover:bg-neutral-800 font-semibold"
+                            : "border-black/30 text-black hover:bg-black/10 font-semibold"
                         }
                         onClick={() => setImageInputMode("upload")}
+                        data-ocid="admin.image.upload_button"
                       >
                         <Upload className="w-3.5 h-3.5 mr-1" />
                         Upload
@@ -397,8 +426,8 @@ function AdminContent() {
                         }
                         className={
                           imageInputMode === "url"
-                            ? "bg-gold text-white hover:bg-gold/90"
-                            : ""
+                            ? "bg-black text-white hover:bg-neutral-800 font-semibold"
+                            : "border-black/30 text-black hover:bg-black/10 font-semibold"
                         }
                         onClick={() => setImageInputMode("url")}
                       >
@@ -408,7 +437,11 @@ function AdminContent() {
                     </div>
 
                     {imageInputMode === "upload" ? (
-                      <div className="border-2 border-dashed border-gold/30 rounded-lg p-3 text-center cursor-pointer hover:border-gold/60 transition-colors">
+                      <div
+                        className="border-2 border-dashed border-black/25 rounded-lg p-3 text-center cursor-pointer hover:border-black/50 transition-colors"
+                        style={{ backgroundColor: "oklch(0.96 0.03 84)" }}
+                        data-ocid="admin.image.dropzone"
+                      >
                         <input
                           type="file"
                           accept="image/*"
@@ -420,8 +453,8 @@ function AdminContent() {
                           htmlFor="product-image-upload"
                           className="cursor-pointer"
                         >
-                          <Upload className="w-6 h-6 text-gold/50 mx-auto mb-1" />
-                          <p className="text-xs text-muted-foreground">
+                          <Upload className="w-6 h-6 text-black/40 mx-auto mb-1" />
+                          <p className="text-xs text-black/55 font-semibold">
                             Tap to upload from photo library
                           </p>
                         </label>
@@ -431,6 +464,7 @@ function AdminContent() {
                         placeholder="Image URL"
                         value={newProduct.imageUrl}
                         onChange={(e) => handleImageUrlChange(e.target.value)}
+                        className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
                       />
                     )}
 
@@ -440,7 +474,7 @@ function AdminContent() {
                         <img
                           src={imagePreview}
                           alt="Preview"
-                          className="w-full h-32 object-cover rounded-lg border border-gold/20"
+                          className="w-full h-32 object-cover rounded-lg border border-black/15"
                         />
                         <Button
                           type="button"
@@ -459,7 +493,8 @@ function AdminContent() {
 
                     <Button
                       type="submit"
-                      className="w-full bg-gold text-white hover:bg-gold/90"
+                      data-ocid="admin.product.submit_button"
+                      className="w-full bg-black text-white hover:bg-neutral-800 font-bold font-display tracking-widest"
                       disabled={addProductMutation.isPending}
                     >
                       {addProductMutation.isPending ? (
@@ -481,12 +516,18 @@ function AdminContent() {
               {/* Products List */}
               <div className="lg:col-span-2 space-y-3">
                 {productsLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+                  <div
+                    className="flex items-center justify-center py-12"
+                    data-ocid="admin.products.loading_state"
+                  >
+                    <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                   </div>
                 ) : products.length === 0 ? (
-                  <Card className="border-gold/20">
-                    <CardContent className="py-12 text-center text-muted-foreground">
+                  <Card className="border-2 border-black/15 bg-white">
+                    <CardContent
+                      className="py-12 text-center text-black/55 font-semibold"
+                      data-ocid="admin.products.empty_state"
+                    >
                       No products yet. Add your first product!
                     </CardContent>
                   </Card>
@@ -495,7 +536,7 @@ function AdminContent() {
                     {paginatedProducts.map((product) => (
                       <Card
                         key={product.id.toString()}
-                        className="border-gold/20"
+                        className="border-2 border-black/15 bg-white shadow-sm"
                       >
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
@@ -508,10 +549,10 @@ function AdminContent() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
                                 <div>
-                                  <h3 className="font-semibold text-foreground truncate">
+                                  <h3 className="font-semibold text-black truncate font-display">
                                     {product.name}
                                   </h3>
-                                  <p className="text-xs text-muted-foreground truncate">
+                                  <p className="text-xs text-black/55 truncate font-semibold">
                                     {product.category}
                                   </p>
                                 </div>
@@ -519,10 +560,10 @@ function AdminContent() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className={`text-xs h-7 px-2 ${
+                                    className={`text-xs h-7 px-2 font-bold ${
                                       product.inStock
-                                        ? "border-green-500/50 text-green-600 hover:bg-green-50"
-                                        : "border-red-400/50 text-red-500 hover:bg-red-50"
+                                        ? "border-green-600 text-green-800 hover:bg-green-50 bg-green-50"
+                                        : "border-red-500 text-red-700 hover:bg-red-50 bg-red-50"
                                     }`}
                                     onClick={() => handleToggleStock(product)}
                                     disabled={updateStockMutation.isPending}
@@ -539,6 +580,7 @@ function AdminContent() {
                                       handleDeleteProduct(product.id)
                                     }
                                     disabled={deleteProductMutation.isPending}
+                                    data-ocid="admin.product.delete_button"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </Button>
@@ -559,43 +601,46 @@ function AdminContent() {
                                           value: e.target.value,
                                         })
                                       }
-                                      className="h-7 w-24 text-sm"
+                                      className="h-7 w-24 text-sm bg-amber-50 border-black/20 text-black"
                                     />
                                     <Button
                                       size="icon"
                                       variant="ghost"
-                                      className="w-7 h-7 text-green-600"
+                                      className="w-7 h-7 text-green-700 hover:bg-green-50"
                                       onClick={() =>
                                         handleSavePrice(product.id)
                                       }
                                       disabled={updatePriceMutation.isPending}
+                                      data-ocid="admin.product.save_button"
                                     >
                                       <Check className="w-3.5 h-3.5" />
                                     </Button>
                                     <Button
                                       size="icon"
                                       variant="ghost"
-                                      className="w-7 h-7 text-muted-foreground"
+                                      className="w-7 h-7 text-black/50 hover:bg-black/10"
                                       onClick={() => setEditingPrice(null)}
+                                      data-ocid="admin.product.cancel_button"
                                     >
                                       <X className="w-3.5 h-3.5" />
                                     </Button>
                                   </>
                                 ) : (
                                   <>
-                                    <span className="text-sm font-semibold text-gold">
+                                    <span className="text-sm font-bold text-gold">
                                       €{product.price.toFixed(2)}
                                     </span>
                                     <Button
                                       size="icon"
                                       variant="ghost"
-                                      className="w-6 h-6 text-muted-foreground hover:text-gold"
+                                      className="w-6 h-6 text-black/45 hover:text-black"
                                       onClick={() =>
                                         setEditingPrice({
                                           id: product.id,
                                           value: product.price.toString(),
                                         })
                                       }
+                                      data-ocid="admin.product.edit_button"
                                     >
                                       <Edit2 className="w-3 h-3" />
                                     </Button>
@@ -618,13 +663,13 @@ function AdminContent() {
                             setProductPage((p) => Math.max(1, p - 1))
                           }
                           disabled={productPage === 1}
-                          className="border-gold/30 hover:bg-gold/10"
+                          className="border-black/30 hover:bg-black/10 text-black font-semibold"
                           data-ocid="admin.products.pagination_prev"
                         >
                           <ChevronLeft className="h-4 w-4 mr-1" />
                           Prev
                         </Button>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-black/60 font-semibold">
                           {productPage} / {totalProductPages}
                         </span>
                         <Button
@@ -636,7 +681,7 @@ function AdminContent() {
                             )
                           }
                           disabled={productPage === totalProductPages}
-                          className="border-gold/30 hover:bg-gold/10"
+                          className="border-black/30 hover:bg-black/10 text-black font-semibold"
                           data-ocid="admin.products.pagination_next"
                         >
                           Next
@@ -653,12 +698,18 @@ function AdminContent() {
           {/* ── Orders Tab ───────────────────────────────────────────────── */}
           <TabsContent value="orders">
             {ordersLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="w-8 h-8 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
+              <div
+                className="flex items-center justify-center py-12"
+                data-ocid="admin.orders.loading_state"
+              >
+                <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin" />
               </div>
             ) : orders.length === 0 ? (
-              <Card className="border-gold/20">
-                <CardContent className="py-12 text-center text-muted-foreground">
+              <Card className="border-2 border-black/15 bg-white">
+                <CardContent
+                  className="py-12 text-center text-black/55 font-semibold"
+                  data-ocid="admin.orders.empty_state"
+                >
                   No orders yet.
                 </CardContent>
               </Card>
@@ -667,13 +718,16 @@ function AdminContent() {
                 {[...orders]
                   .sort((a, b) => Number(b.timestamp - a.timestamp))
                   .map((order) => (
-                    <Card key={order.id.toString()} className="border-gold/20">
+                    <Card
+                      key={order.id.toString()}
+                      className="border-2 border-black/15 bg-white shadow-sm"
+                    >
                       <CardContent className="p-5">
                         {/* Order header */}
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-foreground">
+                              <span className="font-bold text-black font-display">
                                 Order #{order.id.toString()}
                               </span>
                               <Badge
@@ -682,7 +736,7 @@ function AdminContent() {
                                 {formatOrderStatus(order.status)}
                               </Badge>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-0.5">
+                            <p className="text-xs text-black/55 mt-0.5 font-semibold">
                               {new Date(
                                 Number(order.timestamp) / 1_000_000,
                               ).toLocaleString()}
@@ -698,39 +752,39 @@ function AdminContent() {
                         {/* Status tracker */}
                         <OrderStatusTracker status={order.status} />
 
-                        <Separator className="my-4" />
+                        <Separator className="my-4 bg-black/10" />
 
                         {/* Customer info */}
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm mb-4">
                           <div>
-                            <span className="text-muted-foreground text-xs">
+                            <span className="text-black/50 text-xs font-bold uppercase tracking-wide">
                               Customer
                             </span>
-                            <p className="font-medium">
+                            <p className="font-semibold text-black">
                               {order.customerInfo.name}
                             </p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground text-xs">
+                            <span className="text-black/50 text-xs font-bold uppercase tracking-wide">
                               Phone
                             </span>
-                            <p className="font-medium">
+                            <p className="font-semibold text-black">
                               {order.customerInfo.phone}
                             </p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground text-xs">
+                            <span className="text-black/50 text-xs font-bold uppercase tracking-wide">
                               Country
                             </span>
-                            <p className="font-medium">
+                            <p className="font-semibold text-black">
                               {order.customerInfo.country}
                             </p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground text-xs">
+                            <span className="text-black/50 text-xs font-bold uppercase tracking-wide">
                               Address
                             </span>
-                            <p className="font-medium">
+                            <p className="font-semibold text-black">
                               {order.customerInfo.address}
                             </p>
                           </div>
@@ -738,7 +792,7 @@ function AdminContent() {
 
                         {/* Order items with thumbnails */}
                         <div className="space-y-2 mb-4">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                          <p className="text-xs font-bold text-black/55 uppercase tracking-wide">
                             Items
                           </p>
                           {order.items.map(([productId, quantity], idx) => {
@@ -749,7 +803,10 @@ function AdminContent() {
                               <div
                                 // biome-ignore lint/suspicious/noArrayIndexKey: order items have no stable key
                                 key={idx}
-                                className="flex items-center gap-3 p-2 rounded-lg bg-gold/5 border border-gold/10"
+                                className="flex items-center gap-3 p-2 rounded-lg border border-black/10"
+                                style={{
+                                  backgroundColor: "oklch(0.96 0.03 84)",
+                                }}
                               >
                                 <ProductThumbnail
                                   imageUrl={product?.imageUrl ?? ""}
@@ -758,23 +815,23 @@ function AdminContent() {
                                   }
                                 />
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-foreground truncate">
+                                  <p className="text-sm font-semibold text-black truncate">
                                     {product?.name ??
                                       `Product #${productId.toString()}`}
                                   </p>
                                   {product?.category && (
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-xs text-black/55 font-semibold">
                                       {product.category}
                                     </p>
                                   )}
                                 </div>
                                 <div className="text-right flex-shrink-0">
-                                  <p className="text-sm font-semibold text-gold">
+                                  <p className="text-sm font-bold text-gold">
                                     {product
                                       ? `€${product.price.toFixed(2)}`
                                       : ""}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">
+                                  <p className="text-xs text-black/55 font-semibold">
                                     Qty: {quantity.toString()}
                                   </p>
                                 </div>
@@ -796,10 +853,13 @@ function AdminContent() {
                               }
                               disabled={updateOrderStatusMutation.isPending}
                             >
-                              <SelectTrigger className="w-40 h-8 text-sm border-gold/30">
+                              <SelectTrigger
+                                data-ocid="admin.order.status.select"
+                                className="w-40 h-8 text-sm border-black/25 text-black bg-white font-semibold"
+                              >
                                 <SelectValue />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="bg-white border-black/20">
                                 <SelectItem value={OrderStatus.pending}>
                                   Pending
                                 </SelectItem>
@@ -818,9 +878,10 @@ function AdminContent() {
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-8 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                              className="h-8 text-xs border-destructive/40 text-destructive hover:bg-destructive/10 font-semibold"
                               onClick={() => handleCancelOrder(order.id)}
                               disabled={cancelOrderMutation.isPending}
+                              data-ocid="admin.order.cancel_button"
                             >
                               {cancelOrderMutation.isPending ? (
                                 <div className="w-3 h-3 border border-destructive/30 border-t-destructive rounded-full animate-spin mr-1" />

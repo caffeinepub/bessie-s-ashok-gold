@@ -8,7 +8,13 @@ export default function Footer() {
   );
 
   return (
-    <footer className="border-t border-gold/20 bg-secondary mt-auto">
+    <footer
+      className="mt-auto"
+      style={{
+        backgroundColor: "oklch(0.88 0.16 82)",
+        borderTop: "2px solid oklch(0.65 0.13 72 / 0.35)",
+      }}
+    >
       <div className="container mx-auto px-4 md:px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Brand */}
@@ -18,7 +24,7 @@ export default function Footer() {
               alt="Bessie's Ashok Gold"
               className="h-10 w-auto object-contain mb-3"
             />
-            <p className="text-sm text-muted-foreground font-body leading-relaxed">
+            <p className="text-sm text-black/75 font-body leading-relaxed">
               Exquisite gold jewelry and collectibles, crafted with timeless
               elegance for the discerning connoisseur.
             </p>
@@ -26,7 +32,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display text-xs tracking-widest uppercase text-gold mb-4">
+            <h4 className="font-display text-xs tracking-widest uppercase text-black font-bold mb-4">
               Quick Links
             </h4>
             <ul className="space-y-2">
@@ -40,7 +46,7 @@ export default function Footer() {
                 <li key={to}>
                   <Link
                     to={to}
-                    className="text-sm text-muted-foreground hover:text-gold transition-colors font-body"
+                    className="text-sm text-black/75 hover:text-black transition-colors font-body font-medium"
                   >
                     {label}
                   </Link>
@@ -51,7 +57,7 @@ export default function Footer() {
 
           {/* Categories */}
           <div>
-            <h4 className="font-display text-xs tracking-widest uppercase text-gold mb-4">
+            <h4 className="font-display text-xs tracking-widest uppercase text-black font-bold mb-4">
               Categories
             </h4>
             <ul className="space-y-2">
@@ -60,7 +66,7 @@ export default function Footer() {
                   <li key={cat}>
                     <Link
                       to="/shop"
-                      className="text-sm text-muted-foreground hover:text-gold transition-colors font-body"
+                      className="text-sm text-black/75 hover:text-black transition-colors font-body font-medium"
                     >
                       {cat}
                     </Link>
@@ -72,17 +78,21 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gold/15 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-muted-foreground font-body">
+        <div
+          className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
+          style={{ borderTop: "1px solid oklch(0.65 0.13 72 / 0.3)" }}
+        >
+          <p className="text-xs text-black/70 font-body">
             © {year} Bessie's Ashok Gold. All rights reserved.
           </p>
-          <p className="text-xs text-muted-foreground font-body flex items-center gap-1">
-            Built with <Heart className="h-3 w-3 text-gold fill-gold" /> using{" "}
+          <p className="text-xs text-black/70 font-body flex items-center gap-1">
+            Built with <Heart className="h-3 w-3 text-red-600 fill-red-600" />{" "}
+            using{" "}
             <a
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold hover:text-gold-light transition-colors"
+              className="text-black font-semibold hover:underline transition-colors"
             >
               caffeine.ai
             </a>
