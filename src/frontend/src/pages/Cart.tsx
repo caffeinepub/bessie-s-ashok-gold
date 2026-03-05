@@ -310,7 +310,7 @@ export default function Cart() {
           </p>
           <Link
             to="/shop"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-gold text-white font-display text-sm tracking-widest uppercase rounded hover:bg-gold-dark transition-all duration-200 shadow-gold"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-black text-white font-display text-sm tracking-widest uppercase rounded hover:bg-neutral-800 transition-all duration-200"
           >
             Shop Now
           </Link>

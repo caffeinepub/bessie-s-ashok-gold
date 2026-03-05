@@ -187,7 +187,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/shop"
-                className="group inline-flex items-center gap-2 px-8 py-4 bg-gold text-white font-display text-sm tracking-[0.2em] uppercase rounded-none hover:bg-gold-dark transition-all duration-300 shadow-gold hover:shadow-gold-lg"
+                className="group inline-flex items-center gap-2 px-8 py-4 bg-black text-white font-display text-sm tracking-[0.2em] uppercase rounded-none hover:bg-neutral-800 transition-all duration-300"
               >
                 Shop Now
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
