@@ -264,7 +264,16 @@ function AdminContent() {
       setUploadProgress(null);
       const errMsg =
         err instanceof Error ? err.message : "Unknown error occurred";
-      toast.error(`Failed to add product: ${errMsg}. Please try again.`);
+      const isStartupError =
+        errMsg.includes("IC0537") ||
+        errMsg.includes("no wasm") ||
+        errMsg.includes("Requested canister") ||
+        errMsg.includes("starting up");
+      toast.error(
+        isStartupError
+          ? "The server is starting up. Please wait a moment and try again."
+          : "Failed to add product. Please try again.",
+      );
     }
   }
 

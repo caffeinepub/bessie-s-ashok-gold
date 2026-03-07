@@ -1,30 +1,26 @@
 # Bessie's Ashok Gold
 
 ## Current State
-
-Full e-commerce store for Bessie's Ashok Gold jewelry shop. Features:
-- Shop page with 4 categories: Necklace, Bangle, Earrings, Fingering
-- Admin panel (password-protected with "vivek@1870") to add/delete products, toggle stock, manage orders
-- Cart with delivery charges (€30), customer checkout form, previous orders view
-- Currency switcher (EUR base, converts to other currencies)
+Full e-commerce jewelry store with:
+- Shop page with 4 category tabs (Necklace, Bangle, Earrings, Fingering), each holding up to 400 products
+- Admin panel (password protected: vivek@1870) with product management (add/delete/price update/stock toggle), order management (status updates, cancel), product count summary per category
+- Cart with checkout form (name, country, phone, address), delivery charge (€30), currency switcher (base EUR, converts to other currencies)
 - Contact page with WhatsApp and email links
-- Backend stores products, orders, and carts on the ICP canister
-- Blob storage for product images
+- Order notifications via WhatsApp link when order is placed
+- Previous orders view in cart
+- Warm white/gray/black color scheme
 
 ## Requested Changes (Diff)
 
 ### Add
-- Nothing new to add
+- Fresh backend deployment to fix IC0537 "no wasm module" error
 
 ### Modify
-- Force a fresh deployment to fix IC0537 "canister has no wasm module" error
-- The backend Motoko code compiles successfully (verified locally) but the canister on-chain has no wasm installed
+- Backend: Add a small comment change to force recompilation and fresh wasm deployment
 
 ### Remove
-- Nothing to remove
+- Nothing
 
 ## Implementation Plan
-
-1. The backend code is correct and compiles successfully - no changes needed
-2. Trigger a fresh deployment to reinstall the wasm module on the canister
-3. This will resolve the IC0537 error and allow products to be added
+1. Add a comment to backend main.mo to force fresh wasm compilation
+2. Deploy fresh build to fix IC0537 canister error

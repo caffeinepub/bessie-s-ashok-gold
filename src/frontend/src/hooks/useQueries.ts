@@ -4,6 +4,29 @@ import { OrderStatus } from "../backend";
 import { StorageClient } from "../utils/StorageClient";
 import { useActor } from "./useActor";
 
+// ─── IC0537 / "no wasm module" error helper ───────────────────────────────────
+
+const WASM_ERROR_PATTERNS = ["IC0537", "no wasm module", "Requested canister"];
+const FRIENDLY_WASM_MSG =
+  "The server is starting up. Please wait 30 seconds and try again, or refresh the page.";
+
+function isWasmError(err: unknown): boolean {
+  const msg =
+    err instanceof Error
+      ? err.message
+      : typeof err === "string"
+        ? err
+        : JSON.stringify(err);
+  return WASM_ERROR_PATTERNS.some((p) => msg.includes(p));
+}
+
+function rethrowFriendly(err: unknown): never {
+  if (isWasmError(err)) {
+    throw new Error(FRIENDLY_WASM_MSG);
+  }
+  throw err;
+}
+
 // ─── Actor retry helper ──────────────────────────────────────────────────────
 
 /**
@@ -147,7 +170,11 @@ export function usePlaceOrder() {
       address: string;
     }) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.placeOrder(name, country, phone, address);
+      try {
+        return await actor.placeOrder(name, country, phone, address);
+      } catch (err) {
+        rethrowFriendly(err);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
@@ -225,13 +252,18 @@ export function useAddProduct() {
         }
       }
 
-      const newId = await resolvedActor.addProduct(
-        name,
-        description,
-        price,
-        finalImageUrl,
-        category,
-      );
+      let newId: Awaited<ReturnType<typeof resolvedActor.addProduct>>;
+      try {
+        newId = await resolvedActor.addProduct(
+          name,
+          description,
+          price,
+          finalImageUrl,
+          category,
+        );
+      } catch (err) {
+        rethrowFriendly(err);
+      }
 
       return { id: newId, imageUploadFailed };
     },
@@ -248,7 +280,11 @@ export function useDeleteProduct() {
   return useMutation({
     mutationFn: async (id: bigint) => {
       if (!actor) throw new Error("Actor not ready");
-      await actor.deleteProduct(id);
+      try {
+        await actor.deleteProduct(id);
+      } catch (err) {
+        rethrowFriendly(err);
+      }
       return true;
     },
     onSuccess: () => {
@@ -264,7 +300,11 @@ export function useUpdateProductPrice() {
   return useMutation({
     mutationFn: async ({ id, newPrice }: { id: bigint; newPrice: number }) => {
       if (!actor) throw new Error("Actor not ready");
-      await actor.updateProductPrice(id, newPrice);
+      try {
+        await actor.updateProductPrice(id, newPrice);
+      } catch (err) {
+        rethrowFriendly(err);
+      }
       return true;
     },
     onSuccess: () => {
@@ -280,7 +320,11 @@ export function useUpdateProductStock() {
   return useMutation({
     mutationFn: async ({ id, inStock }: { id: bigint; inStock: boolean }) => {
       if (!actor) throw new Error("Actor not ready");
-      await actor.updateProductStock(id, inStock);
+      try {
+        await actor.updateProductStock(id, inStock);
+      } catch (err) {
+        rethrowFriendly(err);
+      }
       return true;
     },
     onSuccess: () => {
@@ -314,7 +358,11 @@ export function useUpdateOrderStatus() {
       newStatus,
     }: { orderId: bigint; newStatus: OrderStatus }) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.updateOrderStatus(orderId, newStatus);
+      try {
+        return await actor.updateOrderStatus(orderId, newStatus);
+      } catch (err) {
+        rethrowFriendly(err);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allOrders"] });
@@ -330,7 +378,11 @@ export function useCancelOrder() {
   return useMutation({
     mutationFn: async (orderId: bigint) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.cancelOrder(orderId);
+      try {
+        return await actor.cancelOrder(orderId);
+      } catch (err) {
+        rethrowFriendly(err);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allOrders"] });
