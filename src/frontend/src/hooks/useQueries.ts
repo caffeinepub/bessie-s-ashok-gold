@@ -1,7 +1,87 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Order, Product } from "../backend";
+import type { Order, Product, backendInterface } from "../backend";
 import { OrderStatus } from "../backend";
+import { StorageClient } from "../utils/StorageClient";
 import { useActor } from "./useActor";
+
+// ─── Actor retry helper ──────────────────────────────────────────────────────
+
+/**
+ * Polls the query cache for a ready actor, waiting up to `timeoutMs`.
+ * Falls back to the inline `actorSnapshot` if available immediately.
+ */
+async function waitForActorReady(
+  actorSnapshot: backendInterface | null,
+  getFromCache: () => backendInterface | null,
+  timeoutMs = 10000,
+): Promise<backendInterface> {
+  if (actorSnapshot) return actorSnapshot;
+
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const cached = getFromCache();
+    if (cached) return cached;
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error(
+    "Backend connection timed out. Please refresh the page and try again.",
+  );
+}
+
+// ─── Image upload via blob storage ───────────────────────────────────────────
+
+const STORAGE_GATEWAY_URL = "https://blob.caffeine.ai";
+const BUCKET_NAME = "default-bucket";
+
+async function uploadImageFile(
+  file: File,
+  onProgress?: (pct: number) => void,
+): Promise<string> {
+  // Load env.json to get canister ID and project ID
+  const envBaseUrl = (import.meta.env.BASE_URL as string) || "/";
+  const baseUrl = envBaseUrl.endsWith("/") ? envBaseUrl : `${envBaseUrl}/`;
+  let canisterId = import.meta.env.VITE_CANISTER_ID_BACKEND as
+    | string
+    | undefined;
+  let projectId = "0000000-0000-0000-0000-00000000000";
+
+  try {
+    const res = await fetch(`${baseUrl}env.json`);
+    const cfg = (await res.json()) as {
+      backend_canister_id?: string;
+      project_id?: string;
+    };
+    if (cfg.backend_canister_id && cfg.backend_canister_id !== "undefined") {
+      canisterId = cfg.backend_canister_id;
+    }
+    if (cfg.project_id && cfg.project_id !== "undefined") {
+      projectId = cfg.project_id;
+    }
+  } catch {
+    // fall through with defaults
+  }
+
+  if (!canisterId) {
+    throw new Error("Backend canister ID not available");
+  }
+
+  const { HttpAgent } = await import("@icp-sdk/core/agent");
+  const agent = new HttpAgent({ host: undefined });
+
+  const storageClient = new StorageClient(
+    BUCKET_NAME,
+    STORAGE_GATEWAY_URL,
+    canisterId,
+    projectId,
+    agent,
+  );
+
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+
+  const { hash } = await storageClient.putFile(bytes, onProgress);
+  return storageClient.getDirectURL(hash);
+}
 
 // ─── Products ────────────────────────────────────────────────────────────────
 
@@ -15,6 +95,7 @@ export function useListProducts() {
       return actor.listProducts();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 0,
   });
 }
 
@@ -24,10 +105,10 @@ export function useGetProduct(id: bigint | null) {
   return useQuery<Product | null>({
     queryKey: ["product", id?.toString()],
     queryFn: async () => {
-      if (!actor || id === null) return null;
+      if (id === null || !actor) return null;
       return actor.getProduct(id);
     },
-    enabled: !!actor && !isFetching && id !== null,
+    enabled: id !== null && !!actor && !isFetching,
   });
 }
 
@@ -99,17 +180,60 @@ export function useAddProduct() {
       name,
       description,
       price,
+      imageFile,
       imageUrl,
       category,
+      onUploadProgress,
     }: {
       name: string;
       description: string;
       price: number;
-      imageUrl: string;
+      imageFile?: File;
+      imageUrl?: string;
       category: string;
+      onUploadProgress?: (pct: number) => void;
     }) => {
-      if (!actor) throw new Error("Actor not ready");
-      return actor.addProduct(name, description, price, imageUrl, category);
+      // Wait for actor — poll query cache if the closure snapshot is stale
+      const getFromCache = (): backendInterface | null => {
+        const allQueries = queryClient.getQueriesData<backendInterface>({
+          queryKey: ["actor"],
+        });
+        for (const [, data] of allQueries) {
+          if (data) return data;
+        }
+        return null;
+      };
+
+      const resolvedActor = await waitForActorReady(actor, getFromCache);
+
+      let finalImageUrl = imageUrl ?? "";
+      let imageUploadFailed = false;
+
+      // If a file was provided, upload it to blob storage to get a real URL.
+      // On any failure (network, certificate, etc.) fall through and save
+      // the product without an image rather than blocking the add entirely.
+      if (imageFile) {
+        try {
+          finalImageUrl = await uploadImageFile(imageFile, onUploadProgress);
+        } catch (uploadErr) {
+          console.warn(
+            "Image upload failed, saving product without image:",
+            uploadErr,
+          );
+          finalImageUrl = "";
+          imageUploadFailed = true;
+        }
+      }
+
+      const newId = await resolvedActor.addProduct(
+        name,
+        description,
+        price,
+        finalImageUrl,
+        category,
+      );
+
+      return { id: newId, imageUploadFailed };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -124,7 +248,8 @@ export function useDeleteProduct() {
   return useMutation({
     mutationFn: async (id: bigint) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.deleteProduct(id);
+      await actor.deleteProduct(id);
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -139,7 +264,8 @@ export function useUpdateProductPrice() {
   return useMutation({
     mutationFn: async ({ id, newPrice }: { id: bigint; newPrice: number }) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.updateProductPrice(id, newPrice);
+      await actor.updateProductPrice(id, newPrice);
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -154,7 +280,8 @@ export function useUpdateProductStock() {
   return useMutation({
     mutationFn: async ({ id, inStock }: { id: bigint; inStock: boolean }) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.updateProductStock(id, inStock);
+      await actor.updateProductStock(id, inStock);
+      return true;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });

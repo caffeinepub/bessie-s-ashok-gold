@@ -21,8 +21,8 @@ export default function Navigation() {
     <header
       className="sticky top-0 z-50 w-full shadow-sm"
       style={{
-        backgroundColor: "oklch(0.88 0.16 82)",
-        borderBottom: "2px solid oklch(0.65 0.13 72 / 0.4)",
+        backgroundColor: "oklch(0.99 0.002 60)",
+        borderBottom: "2px solid oklch(0.85 0 0 / 0.25)",
       }}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
@@ -66,6 +66,9 @@ export default function Navigation() {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
+          <span className="font-display text-sm font-bold text-black tracking-widest uppercase hidden sm:inline">
+            Ashok Gold
+          </span>
           <Link
             to="/cart"
             data-ocid="nav.cart.link"
@@ -101,8 +104,8 @@ export default function Navigation() {
         <div
           className="md:hidden px-4 py-4"
           style={{
-            backgroundColor: "oklch(0.91 0.14 84)",
-            borderTop: "1px solid oklch(0.65 0.13 72 / 0.4)",
+            backgroundColor: "oklch(0.97 0.003 60)",
+            borderTop: "1px solid oklch(0.85 0 0 / 0.2)",
           }}
         >
           <nav className="flex flex-col gap-4">

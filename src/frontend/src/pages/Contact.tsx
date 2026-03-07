@@ -10,24 +10,24 @@ export default function Contact() {
   return (
     <main
       className="min-h-screen"
-      style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+      style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
     >
       {/* Hero Banner */}
       <section
         className="relative py-16 text-center"
         style={{
-          backgroundColor: "oklch(0.88 0.16 82)",
-          borderBottom: "2px solid oklch(0.65 0.13 72 / 0.35)",
+          backgroundColor: "oklch(0.13 0 0)",
+          borderBottom: "2px solid oklch(0.25 0 0)",
         }}
       >
         <div className="container mx-auto px-4 md:px-6">
-          <p className="font-display text-xs tracking-widest uppercase text-black font-bold mb-3">
+          <p className="font-display text-xs tracking-widest uppercase text-white/70 font-bold mb-3">
             Get In Touch
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-black mb-4">
+          <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
             Contact Us
           </h1>
-          <p className="text-black/70 font-body text-lg max-w-xl mx-auto">
+          <p className="text-white/65 font-body text-lg max-w-xl mx-auto">
             We'd love to hear from you. Reach out via WhatsApp or email and
             we'll get back to you as soon as possible.
           </p>
@@ -47,7 +47,7 @@ export default function Contact() {
           >
             <div
               className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black/15 group-hover:border-black/30 transition-colors"
-              style={{ backgroundColor: "oklch(0.88 0.16 82)" }}
+              style={{ backgroundColor: "oklch(0.93 0.003 60)" }}
             >
               <SiWhatsapp className="h-8 w-8 text-black" />
             </div>
@@ -64,8 +64,8 @@ export default function Contact() {
               </span>
             </div>
             <span
-              className="mt-auto inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-display font-bold tracking-wide text-black group-hover:text-white transition-colors"
-              style={{ backgroundColor: "oklch(0.88 0.16 82)" }}
+              className="mt-auto inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-display font-bold tracking-wide text-black group-hover:text-white group-hover:bg-black transition-colors"
+              style={{ backgroundColor: "oklch(0.93 0.003 60)" }}
             >
               <MessageCircle className="h-4 w-4" />
               Open WhatsApp
@@ -80,7 +80,7 @@ export default function Contact() {
           >
             <div
               className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-black/15 group-hover:border-black/30 transition-colors"
-              style={{ backgroundColor: "oklch(0.88 0.16 82)" }}
+              style={{ backgroundColor: "oklch(0.93 0.003 60)" }}
             >
               <Mail className="h-8 w-8 text-black" />
             </div>
@@ -97,8 +97,8 @@ export default function Contact() {
               </span>
             </div>
             <span
-              className="mt-auto inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-display font-bold tracking-wide text-black group-hover:text-white transition-colors"
-              style={{ backgroundColor: "oklch(0.88 0.16 82)" }}
+              className="mt-auto inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-display font-bold tracking-wide text-black group-hover:text-white group-hover:bg-black transition-colors"
+              style={{ backgroundColor: "oklch(0.93 0.003 60)" }}
             >
               <Mail className="h-4 w-4" />
               Send Email
@@ -109,7 +109,7 @@ export default function Contact() {
         {/* Additional Info */}
         <div
           className="max-w-3xl mx-auto mt-12 p-8 rounded-2xl border-2 border-black/15 text-center"
-          style={{ backgroundColor: "oklch(0.93 0.08 84)" }}
+          style={{ backgroundColor: "oklch(0.95 0.003 60)" }}
         >
           <MapPin className="h-6 w-6 text-black mx-auto mb-3" />
           <h3 className="font-display text-lg font-bold text-black mb-2">

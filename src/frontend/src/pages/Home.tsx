@@ -18,15 +18,15 @@ import { useEffect, useRef, useState } from "react";
 
 function ProductSkeleton() {
   return (
-    <div className="bg-white border border-gold/20 rounded-xl overflow-hidden shadow-sm">
-      <Skeleton className="aspect-square w-full bg-amber-100" />
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+      <Skeleton className="aspect-square w-full bg-gray-100" />
       <div className="p-4 space-y-2">
-        <Skeleton className="h-3 w-16 bg-amber-100" />
-        <Skeleton className="h-4 w-3/4 bg-amber-100" />
-        <Skeleton className="h-3 w-full bg-amber-100" />
+        <Skeleton className="h-3 w-16 bg-gray-100" />
+        <Skeleton className="h-4 w-3/4 bg-gray-100" />
+        <Skeleton className="h-3 w-full bg-gray-100" />
         <div className="flex justify-between items-center pt-1">
-          <Skeleton className="h-5 w-20 bg-amber-100" />
-          <Skeleton className="h-7 w-16 bg-amber-100" />
+          <Skeleton className="h-5 w-20 bg-gray-100" />
+          <Skeleton className="h-7 w-16 bg-gray-100" />
         </div>
       </div>
     </div>
@@ -57,7 +57,7 @@ function CurrencySelector() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         data-ocid="currency.select"
-        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-black/30 hover:border-black text-black font-display text-xs tracking-[0.2em] uppercase rounded-none shadow-sm hover:shadow-md transition-all duration-200 min-w-[130px] justify-between"
+        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-gray-300 hover:border-black text-black font-display text-xs tracking-[0.2em] uppercase rounded-none shadow-sm hover:shadow-md transition-all duration-200 min-w-[130px] justify-between"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
@@ -75,7 +75,7 @@ function CurrencySelector() {
       {/* Dropdown */}
       {open && (
         <div
-          className="absolute top-full left-0 mt-1 z-50 bg-white border-2 border-black/20 shadow-xl min-w-[180px] rounded-none overflow-hidden"
+          className="absolute top-full left-0 mt-1 z-50 bg-white border-2 border-gray-200 shadow-xl min-w-[180px] rounded-none overflow-hidden"
           data-ocid="currency.dropdown_menu"
         >
           {CURRENCIES.map((c) => (
@@ -89,12 +89,12 @@ function CurrencySelector() {
               className={`w-full flex items-center gap-3 px-4 py-2.5 text-left font-body text-xs transition-all duration-150
                 ${
                   currency.code === c.code
-                    ? "bg-black text-white font-semibold ring-2 ring-amber-400 ring-inset"
-                    : "text-black hover:bg-amber-100 hover:text-black border-l-4 border-l-transparent"
+                    ? "bg-black text-white font-semibold ring-2 ring-gray-400 ring-inset"
+                    : "text-black hover:bg-gray-100 hover:text-black border-l-4 border-l-transparent"
                 }`}
             >
               <span
-                className={`text-sm font-semibold w-5 text-center ${currency.code === c.code ? "text-amber-300" : "text-gold"}`}
+                className={`text-sm font-semibold w-5 text-center ${currency.code === c.code ? "text-gray-300" : "text-gold"}`}
               >
                 {c.symbol}
               </span>
@@ -147,11 +147,11 @@ export default function Home() {
   const featuredProducts = products?.slice(0, 4) ?? [];
 
   return (
-    <main style={{ backgroundColor: "oklch(0.98 0.025 85)" }}>
+    <main style={{ backgroundColor: "oklch(0.98 0.003 60)" }}>
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section
         className="relative min-h-[600px] lg:min-h-[680px] flex items-center overflow-hidden"
-        style={{ backgroundColor: "oklch(0.93 0.1 82)" }}
+        style={{ backgroundColor: "oklch(0.96 0.003 60)" }}
       >
         {/* Background image */}
         <div
@@ -161,16 +161,16 @@ export default function Home() {
               "url('/assets/generated/hero-home-bg.dim_1440x600.jpg')",
           }}
         />
-        {/* Bright warm overlay — vivid amber/yellow tones */}
+        {/* Warm white overlay */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to right, oklch(0.93 0.1 82 / 0.95), oklch(0.93 0.1 82 / 0.75), oklch(0.93 0.1 82 / 0.2))",
+              "linear-gradient(to right, oklch(0.97 0.003 60 / 0.95), oklch(0.97 0.003 60 / 0.75), oklch(0.97 0.003 60 / 0.2))",
           }}
         />
         {/* Gold shimmer at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-80" />
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-gold to-transparent opacity-60" />
 
         <div className="relative container mx-auto px-6 md:px-10 py-24">
           <div className="max-w-2xl">
@@ -232,13 +232,13 @@ export default function Home() {
       <section
         className="py-8"
         style={{
-          backgroundColor: "oklch(0.88 0.16 82)",
-          borderTop: "1px solid oklch(0.65 0.13 72 / 0.3)",
-          borderBottom: "1px solid oklch(0.65 0.13 72 / 0.3)",
+          backgroundColor: "oklch(0.13 0 0)",
+          borderTop: "1px solid oklch(0.25 0 0)",
+          borderBottom: "1px solid oklch(0.25 0 0)",
         }}
       >
         <div className="container mx-auto px-6 md:px-10">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-black/15">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-white/10">
             {trustItems.map(({ icon: Icon, title, desc }) => (
               <div
                 key={title}
@@ -246,14 +246,14 @@ export default function Home() {
               >
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center mb-1"
-                  style={{ backgroundColor: "oklch(0 0 0 / 0.12)" }}
+                  style={{ backgroundColor: "oklch(1 0 0 / 0.1)" }}
                 >
-                  <Icon className="h-5 w-5 text-black" />
+                  <Icon className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-display text-xs tracking-[0.2em] uppercase text-black font-bold">
+                <span className="font-display text-xs tracking-[0.2em] uppercase text-white font-bold">
                   {title}
                 </span>
-                <span className="text-xs text-black/70 font-body leading-snug">
+                <span className="text-xs text-white/65 font-body leading-snug">
                   {desc}
                 </span>
               </div>
@@ -265,7 +265,7 @@ export default function Home() {
       {/* ── FEATURED PRODUCTS ────────────────────────────────── */}
       <section
         className="py-20"
-        style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+        style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
       >
         <div className="container mx-auto px-6 md:px-10">
           {/* Section header */}
@@ -304,7 +304,7 @@ export default function Home() {
           ) : (
             <div
               className="text-center py-16 border-2 border-dashed rounded-xl"
-              style={{ borderColor: "oklch(0.65 0.13 72 / 0.3)" }}
+              style={{ borderColor: "oklch(0.75 0 0)" }}
               data-ocid="home.products.empty_state"
             >
               <Gem className="h-10 w-10 text-gold/50 mx-auto mb-3" />
@@ -331,7 +331,7 @@ export default function Home() {
       {/* ── BRAND STORY ──────────────────────────────────────── */}
       <section
         className="py-20"
-        style={{ backgroundColor: "oklch(0.93 0.08 84)" }}
+        style={{ backgroundColor: "oklch(0.95 0.003 60)" }}
       >
         <div className="container mx-auto px-6 md:px-10">
           <div className="max-w-3xl mx-auto text-center">
@@ -384,14 +384,14 @@ export default function Home() {
       {/* ── FOOTER CTA STRIP ─────────────────────────────────── */}
       <section
         className="relative py-20 overflow-hidden"
-        style={{ backgroundColor: "oklch(0.85 0.18 78)" }}
+        style={{ backgroundColor: "oklch(0.15 0 0)" }}
       >
-        {/* Warm pattern overlay */}
+        {/* Subtle pattern overlay */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(45deg, oklch(0 0 0) 0, oklch(0 0 0) 1px, transparent 0, transparent 50%)",
+              "repeating-linear-gradient(45deg, oklch(1 0 0) 0, oklch(1 0 0) 1px, transparent 0, transparent 50%)",
             backgroundSize: "20px 20px",
           }}
         />
@@ -399,32 +399,32 @@ export default function Home() {
           className="absolute top-0 left-0 right-0 h-0.5"
           style={{
             background:
-              "linear-gradient(to right, transparent, oklch(0.1 0 0 / 0.3), transparent)",
+              "linear-gradient(to right, transparent, oklch(1 0 0 / 0.15), transparent)",
           }}
         />
         <div
           className="absolute bottom-0 left-0 right-0 h-0.5"
           style={{
             background:
-              "linear-gradient(to right, transparent, oklch(0.1 0 0 / 0.3), transparent)",
+              "linear-gradient(to right, transparent, oklch(1 0 0 / 0.15), transparent)",
           }}
         />
 
         <div className="relative container mx-auto px-6 md:px-10 text-center">
           <div className="inline-flex items-center gap-3 mb-6">
-            <span className="h-px w-10 bg-black/40" />
-            <span className="font-display text-black text-sm tracking-widest font-bold">
+            <span className="h-px w-10 bg-white/30" />
+            <span className="font-display text-white text-sm tracking-widest font-bold">
               ✦
             </span>
-            <span className="h-px w-10 bg-black/40" />
+            <span className="h-px w-10 bg-white/30" />
           </div>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-black mb-4 leading-tight">
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
             Looking for Something{" "}
             <span className="underline decoration-gold/70 underline-offset-4">
               Special?
             </span>
           </h2>
-          <p className="font-body text-base text-black/70 mb-10 max-w-lg mx-auto leading-relaxed">
+          <p className="font-body text-base text-white/65 mb-10 max-w-lg mx-auto leading-relaxed">
             Contact us for custom orders, bulk purchases, or any inquiries about
             our gold collection. We're here to help.
           </p>
@@ -432,7 +432,7 @@ export default function Home() {
             <Link
               to="/shop"
               data-ocid="home.cta.browse_button"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-black text-white font-display text-sm tracking-[0.2em] uppercase rounded-none hover:bg-neutral-800 transition-all duration-300 shadow-lg font-semibold"
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-display text-sm tracking-[0.2em] uppercase rounded-none hover:bg-gray-100 transition-all duration-300 shadow-lg font-semibold"
             >
               Browse Shop
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -440,7 +440,7 @@ export default function Home() {
             <Link
               to="/contact"
               data-ocid="home.cta.contact_button"
-              className="group inline-flex items-center gap-2 px-8 py-4 border-2 border-black text-black font-display text-sm tracking-[0.2em] uppercase rounded-none hover:bg-black hover:text-white transition-all duration-300 font-semibold"
+              className="group inline-flex items-center gap-2 px-8 py-4 border-2 border-white text-white font-display text-sm tracking-[0.2em] uppercase rounded-none hover:bg-white hover:text-black transition-all duration-300 font-semibold"
             >
               Get in Touch
               <Phone className="h-4 w-4" />

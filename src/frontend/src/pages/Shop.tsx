@@ -19,19 +19,19 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
-const PRODUCTS_PER_PAGE = 20;
+const PRODUCTS_PER_PAGE = 400;
 
 function ProductSkeleton() {
   return (
     <div className="rounded-lg overflow-hidden border border-gold/20 bg-white shadow-sm">
-      <Skeleton className="aspect-square w-full bg-amber-100" />
+      <Skeleton className="aspect-square w-full bg-gray-100" />
       <div className="p-4 space-y-2">
-        <Skeleton className="h-3 w-16 bg-amber-100" />
-        <Skeleton className="h-4 w-3/4 bg-amber-100" />
-        <Skeleton className="h-3 w-full bg-amber-100" />
+        <Skeleton className="h-3 w-16 bg-gray-100" />
+        <Skeleton className="h-4 w-3/4 bg-gray-100" />
+        <Skeleton className="h-3 w-full bg-gray-100" />
         <div className="flex justify-between items-center pt-1">
-          <Skeleton className="h-5 w-20 bg-amber-100" />
-          <Skeleton className="h-7 w-16 bg-amber-100" />
+          <Skeleton className="h-5 w-20 bg-gray-100" />
+          <Skeleton className="h-7 w-16 bg-gray-100" />
         </div>
       </div>
     </div>
@@ -53,12 +53,6 @@ export default function Shop() {
   const [selectedPriceRange, setSelectedPriceRange] = useState("0");
   const [sortBy, setSortBy] = useState("default");
   const [currentPage, setCurrentPage] = useState(1);
-
-  const categories = useMemo(() => {
-    if (!products) return [];
-    const cats = Array.from(new Set(products.map((p) => p.category)));
-    return cats.sort();
-  }, [products]);
 
   const filtered = useMemo(() => {
     if (!products) return [];
@@ -115,11 +109,11 @@ export default function Shop() {
   return (
     <main
       className="min-h-screen"
-      style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+      style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
     >
       <div className="container mx-auto px-4 md:px-6 py-10">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <p className="font-body text-xs tracking-[0.3em] uppercase text-black font-bold mb-1">
             Our Collection
           </p>
@@ -127,6 +121,52 @@ export default function Shop() {
             Shop <span className="gold-text">All Products</span>
           </h1>
           <div className="mt-3 w-16 h-0.5 bg-gold/60" />
+        </div>
+
+        {/* Category Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {(
+            [
+              { label: "All", value: "all", ocid: "shop.category.all.tab" },
+              {
+                label: "Necklace",
+                value: "Necklace",
+                ocid: "shop.category.necklace.tab",
+              },
+              {
+                label: "Bangle",
+                value: "Bangle",
+                ocid: "shop.category.bangle.tab",
+              },
+              {
+                label: "Earrings",
+                value: "Earrings",
+                ocid: "shop.category.earrings.tab",
+              },
+              {
+                label: "Fingering",
+                value: "Fingering",
+                ocid: "shop.category.fingering.tab",
+              },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              data-ocid={tab.ocid}
+              onClick={() => {
+                setSelectedCategory(tab.value);
+                setCurrentPage(1);
+              }}
+              className={`px-5 py-2 rounded-full text-sm font-semibold font-body transition-colors ${
+                selectedCategory === tab.value
+                  ? "bg-black text-white"
+                  : "border border-black/20 text-black hover:bg-black/5"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Filters */}
@@ -145,27 +185,6 @@ export default function Shop() {
               className="pl-9 bg-white border-black/20 focus:border-black/60 text-black placeholder:text-black/40"
             />
           </div>
-
-          {/* Category */}
-          <Select
-            value={selectedCategory}
-            onValueChange={handleFilterChange(setSelectedCategory)}
-          >
-            <SelectTrigger
-              data-ocid="shop.category.select"
-              className="w-full sm:w-44 bg-white border-black/20 text-black"
-            >
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent className="bg-white border-black/20">
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           {/* Price Range */}
           <Select

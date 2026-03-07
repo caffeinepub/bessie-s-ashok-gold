@@ -54,12 +54,12 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link to="/product/$id" params={{ id: product.id.toString() }}>
         <div
           className="relative overflow-hidden aspect-square"
-          style={{ backgroundColor: "oklch(0.96 0.03 84)" }}
+          style={{ backgroundColor: "oklch(0.96 0.003 60)" }}
         >
           {imgFailed ? (
             <div
               className="w-full h-full flex flex-col items-center justify-center gap-2"
-              style={{ backgroundColor: "oklch(0.96 0.03 84)" }}
+              style={{ backgroundColor: "oklch(0.96 0.003 60)" }}
             >
               <ImageOff className="h-10 w-10 text-black/25" />
               <span className="text-[10px] font-body tracking-widest uppercase text-black/35 font-semibold">

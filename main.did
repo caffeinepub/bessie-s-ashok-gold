@@ -1,0 +1,54 @@
+type Time = int;
+type Product = 
+ record {
+   category: text;
+   description: text;
+   id: nat;
+   imageUrl: text;
+   inStock: bool;
+   name: text;
+   price: float64;
+ };
+type OrderStatus = 
+ variant {
+   cancelled;
+   delivered;
+   pending;
+   processing;
+   shipped;
+ };
+type Order = 
+ record {
+   customerInfo: CustomerInfo;
+   id: nat;
+   items: vec record {
+                nat;
+                nat;
+              };
+   status: OrderStatus;
+   timestamp: Time;
+   total: float64;
+ };
+type CustomerInfo = 
+ record {
+   address: text;
+   country: text;
+   name: text;
+   phone: text;
+ };
+service : {
+  addProduct: (name: text, description: text, price: float64, imageUrl: 
+   text, category: text) -> (nat);
+  addToCart: (productId: nat, quantity: nat) -> ();
+  cancelOrder: (orderId: nat) -> (bool);
+  deleteProduct: (id: nat) -> (bool);
+  getAllOrders: () -> (vec Order) query;
+  getOrders: () -> (vec Order) query;
+  getProduct: (id: nat) -> (opt Product) query;
+  listProducts: () -> (vec Product) query;
+  placeOrder: (name: text, country: text, phone: text, address: text) ->
+   (opt nat);
+  updateOrderStatus: (orderId: nat, newStatus: OrderStatus) -> (bool);
+  updateProductPrice: (id: nat, newPrice: float64) -> (bool);
+  updateProductStock: (id: nat, inStock: bool) -> (bool);
+}

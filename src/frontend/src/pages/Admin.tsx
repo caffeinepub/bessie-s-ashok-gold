@@ -1,3 +1,4 @@
+import { Progress } from "@/components/ui/progress";
 import {
   Check,
   ChevronLeft,
@@ -13,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const ADMIN_PRODUCTS_PER_PAGE = 20;
 import { OrderStatus, type Product } from "@/backend";
@@ -30,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useActor } from "@/hooks/useActor";
 import {
   useAddProduct,
   useCancelOrder,
@@ -139,7 +142,7 @@ function ProductThumbnail({
     return (
       <div
         className="w-12 h-12 rounded-lg border border-black/15 flex items-center justify-center flex-shrink-0"
-        style={{ backgroundColor: "oklch(0.93 0.08 84)" }}
+        style={{ backgroundColor: "oklch(0.95 0.003 60)" }}
       >
         <ImageOff className="w-5 h-5 text-black/30" />
       </div>
@@ -159,10 +162,13 @@ function ProductThumbnail({
 // ─── Admin Content (rendered inside the password gate) ───────────────────────
 
 function AdminContent() {
+  const { actor, isFetching: actorLoading } = useActor();
+
   const [newProduct, setNewProduct] = useState({
     name: "",
     description: "",
     price: "",
+    imageFile: null as File | null,
     imageUrl: "",
     category: "",
   });
@@ -170,6 +176,7 @@ function AdminContent() {
     "upload",
   );
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [editingPrice, setEditingPrice] = useState<{
     id: bigint;
     value: string;
@@ -204,13 +211,8 @@ function AdminContent() {
   function handleImageFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setNewProduct((p) => ({ ...p, imageUrl: dataUrl }));
-      setImagePreview(dataUrl);
-    };
-    reader.readAsDataURL(file);
+    setNewProduct((p) => ({ ...p, imageFile: file, imageUrl: "" }));
+    setImagePreview(URL.createObjectURL(file));
   }
 
   function handleImageUrlChange(url: string) {
@@ -218,24 +220,52 @@ function AdminContent() {
     setImagePreview(url);
   }
 
+  const [categoryError, setCategoryError] = useState(false);
+
   async function handleAddProduct(e: React.FormEvent) {
     e.preventDefault();
     if (!newProduct.name || !newProduct.price) return;
-    await addProductMutation.mutateAsync({
-      name: newProduct.name,
-      description: newProduct.description,
-      price: Number.parseFloat(newProduct.price),
-      imageUrl: newProduct.imageUrl,
-      category: newProduct.category,
-    });
-    setNewProduct({
-      name: "",
-      description: "",
-      price: "",
-      imageUrl: "",
-      category: "",
-    });
-    setImagePreview("");
+    if (!newProduct.category) {
+      setCategoryError(true);
+      toast.error("Please select a category before adding the product.");
+      return;
+    }
+    setCategoryError(false);
+    setUploadProgress(null);
+    try {
+      const result = await addProductMutation.mutateAsync({
+        name: newProduct.name,
+        description: newProduct.description,
+        price: Number.parseFloat(newProduct.price),
+        imageFile: newProduct.imageFile ?? undefined,
+        imageUrl: newProduct.imageUrl || undefined,
+        category: newProduct.category,
+        onUploadProgress: (pct) => setUploadProgress(pct),
+      });
+      setNewProduct({
+        name: "",
+        description: "",
+        price: "",
+        imageFile: null,
+        imageUrl: "",
+        category: "",
+      });
+      setImagePreview("");
+      setUploadProgress(null);
+      if (result.imageUploadFailed) {
+        toast.warning(
+          "Product saved! Image upload failed — you can add a photo later by re-adding the product.",
+        );
+      } else {
+        toast.success("Product added successfully!");
+      }
+    } catch (err) {
+      console.error("Add product error:", err);
+      setUploadProgress(null);
+      const errMsg =
+        err instanceof Error ? err.message : "Unknown error occurred";
+      toast.error(`Failed to add product: ${errMsg}. Please try again.`);
+    }
   }
 
   async function handleDeleteProduct(id: bigint) {
@@ -290,12 +320,45 @@ function AdminContent() {
     return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
+  // ── Category counts ───────────────────────────────────────────────────────
+
+  const CATEGORIES = ["Necklace", "Bangle", "Earrings", "Fingering"] as const;
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {
+      Necklace: 0,
+      Bangle: 0,
+      Earrings: 0,
+      Fingering: 0,
+    };
+    for (const p of products) {
+      const cat = p.category;
+      if (cat in counts) counts[cat]++;
+    }
+    return counts;
+  }, [products]);
+
   // ── Render ────────────────────────────────────────────────────────────────
+
+  if (actorLoading && !actor) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
+        data-ocid="admin.backend.loading_state"
+      >
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-black/20 border-t-black rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-black/60 font-semibold">Connecting to backend…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       className="min-h-screen"
-      style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+      style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
     >
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
@@ -308,10 +371,42 @@ function AdminContent() {
           </p>
         </div>
 
+        {/* Product Count Summary */}
+        <div
+          className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6"
+          data-ocid="admin.product_counts.section"
+        >
+          {CATEGORIES.map((cat) => (
+            <Card
+              key={cat}
+              className="border-2 border-black/15 bg-white shadow-sm"
+            >
+              <CardContent className="p-4 text-center">
+                <p className="text-xs font-bold text-black/50 uppercase tracking-widest mb-1">
+                  {cat}
+                </p>
+                <p className="text-3xl font-extrabold text-black font-display">
+                  {categoryCounts[cat]}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+          <Card className="border-2 border-black bg-black shadow-sm">
+            <CardContent className="p-4 text-center">
+              <p className="text-xs font-bold text-white/60 uppercase tracking-widest mb-1">
+                Total
+              </p>
+              <p className="text-3xl font-extrabold text-white font-display">
+                {products.length}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
         <Tabs defaultValue="products">
           <TabsList
             className="mb-6"
-            style={{ backgroundColor: "oklch(0.93 0.08 84)" }}
+            style={{ backgroundColor: "oklch(0.95 0.003 60)" }}
           >
             <TabsTrigger
               value="products"
@@ -331,7 +426,7 @@ function AdminContent() {
               {orders.length > 0 && (
                 <Badge
                   variant="secondary"
-                  className="ml-1 text-xs bg-amber-200 text-black font-bold"
+                  className="ml-1 text-xs bg-gray-200 text-black font-bold"
                 >
                   {orders.length}
                 </Badge>
@@ -359,7 +454,7 @@ function AdminContent() {
                         setNewProduct((p) => ({ ...p, name: e.target.value }))
                       }
                       data-ocid="admin.product.name.input"
-                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
+                      className="bg-gray-50 border-black/20 text-black placeholder:text-black/40"
                       required
                     />
                     <Input
@@ -372,7 +467,7 @@ function AdminContent() {
                         }))
                       }
                       data-ocid="admin.product.description.input"
-                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
+                      className="bg-gray-50 border-black/20 text-black placeholder:text-black/40"
                     />
                     <Input
                       placeholder="Price (€) *"
@@ -383,21 +478,43 @@ function AdminContent() {
                         setNewProduct((p) => ({ ...p, price: e.target.value }))
                       }
                       data-ocid="admin.product.price.input"
-                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
+                      className="bg-gray-50 border-black/20 text-black placeholder:text-black/40"
                       required
                     />
-                    <Input
-                      placeholder="Category"
-                      value={newProduct.category}
-                      onChange={(e) =>
-                        setNewProduct((p) => ({
-                          ...p,
-                          category: e.target.value,
-                        }))
-                      }
-                      data-ocid="admin.product.category.input"
-                      className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
-                    />
+                    <div className="space-y-1">
+                      <Select
+                        value={newProduct.category}
+                        onValueChange={(val) => {
+                          setNewProduct((p) => ({ ...p, category: val }));
+                          setCategoryError(false);
+                        }}
+                      >
+                        <SelectTrigger
+                          data-ocid="admin.product.category.select"
+                          className={`bg-gray-50 text-black transition-colors ${
+                            categoryError
+                              ? "border-red-500 ring-1 ring-red-500 focus:ring-red-500"
+                              : "border-black/20"
+                          }`}
+                        >
+                          <SelectValue placeholder="Select Category *" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-black/20">
+                          <SelectItem value="Necklace">Necklace</SelectItem>
+                          <SelectItem value="Bangle">Bangle</SelectItem>
+                          <SelectItem value="Earrings">Earrings</SelectItem>
+                          <SelectItem value="Fingering">Fingering</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {categoryError && (
+                        <p
+                          className="text-xs text-red-600 font-semibold"
+                          data-ocid="admin.product.category.error_state"
+                        >
+                          Category is required
+                        </p>
+                      )}
+                    </div>
 
                     {/* Image input mode toggle */}
                     <div className="flex gap-2">
@@ -464,7 +581,7 @@ function AdminContent() {
                         placeholder="Image URL"
                         value={newProduct.imageUrl}
                         onChange={(e) => handleImageUrlChange(e.target.value)}
-                        className="bg-amber-50 border-black/20 text-black placeholder:text-black/40"
+                        className="bg-gray-50 border-black/20 text-black placeholder:text-black/40"
                       />
                     )}
 
@@ -483,7 +600,11 @@ function AdminContent() {
                           className="absolute top-1 right-1 w-6 h-6"
                           onClick={() => {
                             setImagePreview("");
-                            setNewProduct((p) => ({ ...p, imageUrl: "" }));
+                            setNewProduct((p) => ({
+                              ...p,
+                              imageFile: null,
+                              imageUrl: "",
+                            }));
                           }}
                         >
                           <X className="w-3 h-3" />
@@ -491,16 +612,39 @@ function AdminContent() {
                       </div>
                     )}
 
+                    {/* Upload progress */}
+                    {uploadProgress !== null && (
+                      <div
+                        className="space-y-1"
+                        data-ocid="admin.product.loading_state"
+                      >
+                        <p className="text-xs font-semibold text-black/60">
+                          Uploading image… {Math.round(uploadProgress)}%
+                        </p>
+                        <Progress
+                          value={uploadProgress}
+                          className="h-1.5 bg-black/10 [&>div]:bg-black"
+                        />
+                      </div>
+                    )}
+
                     <Button
                       type="submit"
                       data-ocid="admin.product.submit_button"
-                      className="w-full bg-black text-white hover:bg-neutral-800 font-bold font-display tracking-widest"
-                      disabled={addProductMutation.isPending}
+                      className="w-full bg-black text-white hover:bg-neutral-800 font-bold font-display tracking-widest disabled:opacity-50"
+                      disabled={
+                        addProductMutation.isPending || (!actor && actorLoading)
+                      }
                     >
                       {addProductMutation.isPending ? (
                         <span className="flex items-center gap-2">
                           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Adding...
+                          {uploadProgress !== null ? "Uploading…" : "Adding…"}
+                        </span>
+                      ) : !actor && actorLoading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Connecting…
                         </span>
                       ) : (
                         <>
@@ -601,7 +745,7 @@ function AdminContent() {
                                           value: e.target.value,
                                         })
                                       }
-                                      className="h-7 w-24 text-sm bg-amber-50 border-black/20 text-black"
+                                      className="h-7 w-24 text-sm bg-gray-50 border-black/20 text-black"
                                     />
                                     <Button
                                       size="icon"

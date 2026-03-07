@@ -53,7 +53,7 @@ export default function AdminPasswordGate({
     return (
       <main
         className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+        style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
       >
         <div className="w-full max-w-sm">
           {/* Lock Icon */}
@@ -61,11 +61,11 @@ export default function AdminPasswordGate({
             <div className="relative">
               <div
                 className="absolute inset-0 rounded-full blur-xl scale-150"
-                style={{ backgroundColor: "oklch(0.88 0.16 82 / 0.6)" }}
+                style={{ backgroundColor: "oklch(0.93 0.003 60 / 0.6)" }}
               />
               <div
                 className="relative p-5 rounded-full border-2 border-black/20"
-                style={{ backgroundColor: "oklch(0.88 0.16 82)" }}
+                style={{ backgroundColor: "oklch(0.95 0.003 60)" }}
               >
                 <Lock className="h-10 w-10 text-black" />
               </div>
@@ -105,7 +105,7 @@ export default function AdminPasswordGate({
                   }}
                   placeholder="Enter admin password"
                   data-ocid="admin.login.input"
-                  className="bg-amber-50 border-black/25 focus:border-black/60 text-black placeholder:text-black/35 pr-10 font-semibold"
+                  className="bg-gray-50 border-black/25 focus:border-black/60 text-black placeholder:text-black/35 pr-10 font-semibold"
                   autoFocus
                 />
                 <button
@@ -143,7 +143,7 @@ export default function AdminPasswordGate({
               style={
                 password.length > 0
                   ? {}
-                  : { backgroundColor: "oklch(0.93 0.08 84)" }
+                  : { backgroundColor: "oklch(0.95 0.003 60)" }
               }
             >
               Unlock Admin Panel
@@ -160,7 +160,7 @@ export default function AdminPasswordGate({
       <div
         className="sticky top-0 z-50 backdrop-blur px-4 py-2 flex items-center justify-between shadow-sm"
         style={{
-          backgroundColor: "oklch(0.88 0.16 82 / 0.95)",
+          backgroundColor: "oklch(0.97 0.003 60 / 0.95)",
           borderBottom: "1px solid oklch(0.65 0.13 72 / 0.3)",
         }}
       >

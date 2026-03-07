@@ -30,9 +30,12 @@ import {
   Loader2,
   PackageOpen,
   ShoppingCart,
+  Truck,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+const DELIVERY_CHARGE_EUR = 30;
 
 // ─── Status badge helper ──────────────────────────────────────────────────────
 function statusLabel(status: OrderStatus): {
@@ -43,7 +46,7 @@ function statusLabel(status: OrderStatus): {
     case OrderStatus.pending:
       return {
         label: "Pending",
-        className: "bg-amber-100 text-amber-900 border-amber-300",
+        className: "bg-gray-100 text-gray-800 border-gray-300",
       };
     case OrderStatus.processing:
       return {
@@ -109,7 +112,7 @@ function PreviousOrders() {
         <button
           type="button"
           data-ocid="cart.orders.toggle"
-          className="w-full flex items-center justify-between px-5 py-3.5 rounded-lg border-2 border-black/20 bg-amber-50 hover:bg-amber-100 hover:border-black/40 transition-all duration-200 group"
+          className="w-full flex items-center justify-between px-5 py-3.5 rounded-lg border-2 border-black/20 bg-gray-50 hover:bg-gray-100 hover:border-black/40 transition-all duration-200 group"
         >
           <span className="flex items-center gap-2.5 font-display text-sm tracking-widest uppercase text-black font-bold group-hover:text-black transition-colors">
             <ClockIcon className="h-4 w-4 text-gold" />
@@ -137,9 +140,9 @@ function PreviousOrders() {
             >
               {[1, 2].map((i) => (
                 <div key={i} className="space-y-2">
-                  <Skeleton className="h-4 w-1/3 bg-amber-100" />
-                  <Skeleton className="h-3 w-2/3 bg-amber-100" />
-                  <Skeleton className="h-3 w-1/2 bg-amber-100" />
+                  <Skeleton className="h-4 w-1/3 bg-gray-100" />
+                  <Skeleton className="h-3 w-2/3 bg-gray-100" />
+                  <Skeleton className="h-3 w-1/2 bg-gray-100" />
                 </div>
               ))}
             </div>
@@ -163,7 +166,7 @@ function PreviousOrders() {
                 return (
                   <div
                     key={order.id.toString()}
-                    className="p-4 hover:bg-amber-50 transition-colors"
+                    className="p-4 hover:bg-gray-50 transition-colors"
                   >
                     {/* Order header */}
                     <div className="flex items-start justify-between gap-3 mb-2">
@@ -200,7 +203,7 @@ function PreviousOrders() {
                     {/* Total */}
                     <div className="flex justify-between items-center pt-2 border-t border-black/10">
                       <span className="font-body text-xs text-black/55 font-semibold">
-                        Total
+                        Total (incl. delivery)
                       </span>
                       <span className="font-serif text-sm font-bold text-gold">
                         {convertPrice(order.total)}
@@ -224,7 +227,13 @@ export default function Cart() {
     useCart();
   const placeOrderMutation = usePlaceOrder();
   const addToCartMutation = useAddToCart();
-  const { convertPrice } = useCurrency();
+  const { convertPrice, currency } = useCurrency();
+
+  // Delivery charge always in EUR base, converted for display
+  const deliveryChargeEur = DELIVERY_CHARGE_EUR;
+  // Convert delivery charge using currency rate
+  const deliveryChargeInSelectedCurrency = deliveryChargeEur * currency.rate;
+  const grandTotal = subtotal + deliveryChargeEur;
 
   const [form, setForm] = useState({
     name: "",
@@ -256,7 +265,7 @@ export default function Cart() {
       quantity: item.quantity,
       price: item.product.price,
     }));
-    const orderTotal = subtotal;
+    const orderTotal = grandTotal;
 
     // Sync cart to backend before placing order
     for (const item of items) {
@@ -308,7 +317,7 @@ export default function Cart() {
     return (
       <main
         className="min-h-screen"
-        style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+        style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
       >
         <div className="container mx-auto px-4 md:px-6 py-20">
           <div className="text-center mb-12" data-ocid="cart.empty_state">
@@ -340,7 +349,7 @@ export default function Cart() {
   return (
     <main
       className="min-h-screen"
-      style={{ backgroundColor: "oklch(0.98 0.025 85)" }}
+      style={{ backgroundColor: "oklch(0.98 0.003 60)" }}
     >
       <div className="container mx-auto px-4 md:px-6 py-10">
         {/* Header */}
@@ -405,14 +414,42 @@ export default function Cart() {
                   </div>
                 ))}
               </div>
-              <div className="border-t-2 border-black/15 pt-3 flex justify-between items-center">
-                <span className="font-display text-sm tracking-wide text-black font-bold">
+
+              {/* Subtotal */}
+              <div className="border-t border-black/10 pt-3 flex justify-between items-center mb-2">
+                <span className="font-body text-xs text-black/65 font-semibold">
                   Subtotal
                 </span>
-                <span className="font-serif text-xl font-bold text-gold">
+                <span className="font-body text-sm font-semibold text-black">
                   {convertPrice(subtotal)}
                 </span>
               </div>
+
+              {/* Delivery charge */}
+              <div className="flex justify-between items-center mb-3 bg-gray-50 px-3 py-2 rounded border border-gray-200">
+                <span className="flex items-center gap-1.5 font-body text-xs text-black/70 font-semibold">
+                  <Truck className="h-3.5 w-3.5 text-black/50" />
+                  Delivery Charges
+                </span>
+                <span className="font-body text-xs font-bold text-black">
+                  {currency.symbol}
+                  {deliveryChargeInSelectedCurrency.toFixed(2)}
+                </span>
+              </div>
+
+              {/* Grand Total */}
+              <div className="border-t-2 border-black/20 pt-3 flex justify-between items-center">
+                <span className="font-display text-sm tracking-wide text-black font-bold">
+                  Total
+                </span>
+                <span className="font-serif text-xl font-bold text-gold">
+                  {convertPrice(grandTotal)}
+                </span>
+              </div>
+              <p className="text-[10px] text-black/40 font-body mt-1 text-right">
+                Incl. {currency.symbol}
+                {deliveryChargeInSelectedCurrency.toFixed(2)} delivery
+              </p>
             </div>
 
             {/* Checkout Form */}
@@ -421,7 +458,7 @@ export default function Cart() {
                 type="button"
                 onClick={() => setShowCheckout(true)}
                 data-ocid="cart.checkout.primary_button"
-                className="w-full py-3 bg-gold text-black font-display text-sm tracking-widest uppercase rounded hover:bg-gold-dark transition-all duration-200 shadow-gold font-bold"
+                className="w-full py-3 bg-black text-white font-display text-sm tracking-widest uppercase rounded hover:bg-neutral-800 transition-all duration-200 shadow-sm font-bold"
               >
                 Proceed to Checkout
               </button>
@@ -445,7 +482,7 @@ export default function Cart() {
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     placeholder="Your full name"
                     data-ocid="cart.name.input"
-                    className="bg-amber-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35"
+                    className="bg-gray-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35"
                   />
                   {errors.name && (
                     <p
@@ -474,7 +511,7 @@ export default function Cart() {
                     }
                     placeholder="e.g. Germany, France"
                     data-ocid="cart.country.input"
-                    className="bg-amber-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35"
+                    className="bg-gray-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35"
                   />
                   {errors.country && (
                     <p
@@ -504,7 +541,7 @@ export default function Cart() {
                     }
                     placeholder="+49 123 456 7890"
                     data-ocid="cart.phone.input"
-                    className="bg-amber-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35"
+                    className="bg-gray-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35"
                   />
                   {errors.phone && (
                     <p
@@ -534,7 +571,7 @@ export default function Cart() {
                     placeholder="Street, City, Postal Code"
                     rows={3}
                     data-ocid="cart.address.textarea"
-                    className="bg-amber-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35 resize-none"
+                    className="bg-gray-50 border-black/20 focus:border-black/60 text-black placeholder:text-black/35 resize-none"
                   />
                   {errors.address && (
                     <p
@@ -545,6 +582,30 @@ export default function Cart() {
                       {errors.address}
                     </p>
                   )}
+                </div>
+
+                {/* Bill breakdown before placing order */}
+                <div className="rounded border border-gray-200 bg-gray-50 p-3 space-y-1.5 text-xs font-body">
+                  <p className="font-display text-[10px] tracking-widest uppercase text-black/50 mb-2">
+                    Bill Summary
+                  </p>
+                  <div className="flex justify-between text-black/65">
+                    <span>Subtotal</span>
+                    <span>{convertPrice(subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between text-black/65">
+                    <span className="flex items-center gap-1">
+                      <Truck className="h-3 w-3" /> Delivery Charges
+                    </span>
+                    <span>
+                      {currency.symbol}
+                      {deliveryChargeInSelectedCurrency.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-bold text-black border-t border-gray-300 pt-1.5 mt-1">
+                    <span>Total</span>
+                    <span>{convertPrice(grandTotal)}</span>
+                  </div>
                 </div>
 
                 <button
