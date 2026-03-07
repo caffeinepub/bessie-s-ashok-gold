@@ -1,33 +1,30 @@
 # Bessie's Ashok Gold
 
 ## Current State
-Full e-commerce site with:
-- Shop with 4 categories: Necklace, Bangle, Earrings, Fingering
-- Admin panel (password protected: vivek@1870) with product management, order management, stock toggle, order status
-- Cart with currency switcher (base EUR), €30 delivery charge
-- Customer checkout form (name, country, phone, address)
-- Contact page with WhatsApp/email links
-- Blob storage component selected for image uploads
-- "Ashok Gold" branding in navigation
 
-## Current Problem
-Products cannot be added in the admin panel. The error "Failed to add product" appears. Root cause: the backend actor fails to initialize or the addProduct call throws. The blob-storage Mixin is not properly integrated into main.mo (backend edit is restricted), so image upload calls to `_caffeineStorageCreateCertificate` fail silently and the entire product add operation fails.
+Full e-commerce store for Bessie's Ashok Gold jewelry shop. Features:
+- Shop page with 4 categories: Necklace, Bangle, Earrings, Fingering
+- Admin panel (password-protected with "vivek@1870") to add/delete products, toggle stock, manage orders
+- Cart with delivery charges (€30), customer checkout form, previous orders view
+- Currency switcher (EUR base, converts to other currencies)
+- Contact page with WhatsApp and email links
+- Backend stores products, orders, and carts on the ICP canister
+- Blob storage for product images
 
 ## Requested Changes (Diff)
 
 ### Add
-- Nothing new
+- Nothing new to add
 
 ### Modify
-- Regenerate backend so blob-storage Mixin is properly integrated via the code generator
-- Frontend: improve robustness of addProduct flow — when image upload fails, still save the product without image (already coded but needs the actor to be properly initialized)
-- Frontend: add a retry mechanism in useActor — if actor is not ready after 3 seconds, retry automatically
-- Frontend: show clearer loading state while actor initializes
+- Force a fresh deployment to fix IC0537 "canister has no wasm module" error
+- The backend Motoko code compiles successfully (verified locally) but the canister on-chain has no wasm installed
 
 ### Remove
-- Nothing
+- Nothing to remove
 
 ## Implementation Plan
-1. Regenerate backend (generate_motoko_code) — this will produce a fresh main.mo with blob-storage Mixin included
-2. Update frontend useQueries.ts to handle actor not-ready scenario more gracefully with a wait/retry
-3. Deploy
+
+1. The backend code is correct and compiles successfully - no changes needed
+2. Trigger a fresh deployment to reinstall the wasm module on the canister
+3. This will resolve the IC0537 error and allow products to be added
