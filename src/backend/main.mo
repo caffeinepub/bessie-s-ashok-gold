@@ -1,17 +1,22 @@
 import Iter "mo:core/Iter";
 import Map "mo:core/Map";
 import Array "mo:core/Array";
-import Text "mo:core/Text";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
+import Storage "blob-storage/Storage";
+import MixinStorage "blob-storage/Mixin";
+
+
 
 actor {
+  include MixinStorage();
+
   type Product = {
     id : Nat;
     name : Text;
     description : Text;
     price : Float;
-    imageUrl : Text;
+    image : Storage.ExternalBlob;
     category : Text;
     inStock : Bool;
   };
@@ -37,16 +42,17 @@ actor {
     items : [(Nat, Nat)];
     total : Float;
     status : OrderStatus;
-    timestamp : Time.Time;
+    timestamp : Int;
   };
 
   type Cart = [(Nat, Nat)];
 
+  var nextProductId = 1;
+  var nextOrderId = 1;
+
   let products = Map.empty<Nat, Product>();
   let orders = Map.empty<Nat, Order>();
   let carts = Map.empty<Principal, Cart>();
-  var nextProductId = 1;
-  var nextOrderId = 1;
 
   public query ({ caller }) func listProducts() : async [Product] {
     products.values().toArray();
@@ -56,12 +62,11 @@ actor {
     products.get(id);
   };
 
-  // Admin functions
   public shared ({ caller }) func addProduct(
     name : Text,
     description : Text,
     price : Float,
-    imageUrl : Text,
+    image : Storage.ExternalBlob,
     category : Text,
   ) : async Nat {
     let product : Product = {
@@ -69,7 +74,7 @@ actor {
       name;
       description;
       price;
-      imageUrl;
+      image;
       category;
       inStock = true;
     };

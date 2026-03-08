@@ -16,12 +16,13 @@ export interface CustomerInfo {
   'address' : string,
   'phone' : string,
 }
+export type ExternalBlob = Uint8Array;
 export interface Order {
   'id' : bigint,
   'customerInfo' : CustomerInfo,
   'status' : OrderStatus,
   'total' : number,
-  'timestamp' : Time,
+  'timestamp' : bigint,
   'items' : Array<[bigint, bigint]>,
 }
 export type OrderStatus = { 'shipped' : null } |
@@ -34,13 +35,41 @@ export interface Product {
   'inStock' : boolean,
   'name' : string,
   'description' : string,
-  'imageUrl' : string,
   'category' : string,
+  'image' : ExternalBlob,
   'price' : number,
 }
-export type Time = bigint;
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
-  'addProduct' : ActorMethod<[string, string, number, string, string], bigint>,
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
+  'addProduct' : ActorMethod<
+    [string, string, number, ExternalBlob, string],
+    bigint
+  >,
   'addToCart' : ActorMethod<[bigint, bigint], undefined>,
   'cancelOrder' : ActorMethod<[bigint], boolean>,
   'deleteProduct' : ActorMethod<[bigint], boolean>,

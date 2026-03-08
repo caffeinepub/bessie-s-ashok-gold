@@ -68,7 +68,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           ) : (
             <img
-              src={product.imageUrl}
+              src={product.image.getDirectURL()}
               alt={product.name}
               onError={handleImageError}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

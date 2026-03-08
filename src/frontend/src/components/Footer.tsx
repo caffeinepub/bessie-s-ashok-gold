@@ -19,11 +19,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Brand */}
           <div>
-            <img
-              src="/assets/generated/logo.dim_300x80.png"
-              alt="Bessie's Ashok Gold"
-              className="h-10 w-auto object-contain mb-3"
-            />
+            <span
+              className="font-display text-2xl font-bold tracking-wide text-white block mb-3"
+              style={{ letterSpacing: "0.04em" }}
+            >
+              Ashok Gold
+            </span>
             <p className="text-sm text-white/70 font-body leading-relaxed">
               Exquisite gold jewelry and collectibles, crafted with timeless
               elegance for the discerning connoisseur.

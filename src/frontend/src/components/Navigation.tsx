@@ -32,11 +32,12 @@ export default function Navigation() {
           className="flex items-center gap-2 shrink-0"
           data-ocid="nav.link"
         >
-          <img
-            src="/assets/generated/logo.dim_300x80.png"
-            alt="Bessie's Ashok Gold"
-            className="h-10 w-auto object-contain"
-          />
+          <span
+            className="font-display text-xl font-bold tracking-wide text-black"
+            style={{ letterSpacing: "0.04em" }}
+          >
+            Ashok Gold
+          </span>
         </Link>
 
         {/* Desktop Nav */}
@@ -66,9 +67,6 @@ export default function Navigation() {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
-          <span className="font-display text-sm font-bold text-black tracking-widest uppercase hidden sm:inline">
-            Ashok Gold
-          </span>
           <Link
             to="/cart"
             data-ocid="nav.cart.link"

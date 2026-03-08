@@ -42,7 +42,7 @@ export default function CartItemComponent({
           </div>
         ) : (
           <img
-            src={product.imageUrl}
+            src={product.image.getDirectURL()}
             alt={product.name}
             onError={handleImageError}
             className="w-full h-full object-cover"

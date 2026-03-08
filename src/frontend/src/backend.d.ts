@@ -7,7 +7,13 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export type Time = bigint;
+export class ExternalBlob {
+    getBytes(): Promise<Uint8Array<ArrayBuffer>>;
+    getDirectURL(): string;
+    static fromURL(url: string): ExternalBlob;
+    static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
+    withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
+}
 export interface CustomerInfo {
     country: string;
     name: string;
@@ -19,7 +25,7 @@ export interface Order {
     customerInfo: CustomerInfo;
     status: OrderStatus;
     total: number;
-    timestamp: Time;
+    timestamp: bigint;
     items: Array<[bigint, bigint]>;
 }
 export interface Product {
@@ -27,8 +33,8 @@ export interface Product {
     inStock: boolean;
     name: string;
     description: string;
-    imageUrl: string;
     category: string;
+    image: ExternalBlob;
     price: number;
 }
 export enum OrderStatus {
@@ -39,7 +45,7 @@ export enum OrderStatus {
     processing = "processing"
 }
 export interface backendInterface {
-    addProduct(name: string, description: string, price: number, imageUrl: string, category: string): Promise<bigint>;
+    addProduct(name: string, description: string, price: number, image: ExternalBlob, category: string): Promise<bigint>;
     addToCart(productId: bigint, quantity: bigint): Promise<void>;
     cancelOrder(orderId: bigint): Promise<boolean>;
     deleteProduct(id: bigint): Promise<boolean>;

@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Order, Product, backendInterface } from "../backend";
-import { OrderStatus } from "../backend";
-import { StorageClient } from "../utils/StorageClient";
+import { ExternalBlob, OrderStatus } from "../backend";
 import { useActor } from "./useActor";
 
 // ─── IC0537 / "no wasm module" error helper ───────────────────────────────────
@@ -49,61 +48,6 @@ async function waitForActorReady(
   throw new Error(
     "Backend connection timed out. Please refresh the page and try again.",
   );
-}
-
-// ─── Image upload via blob storage ───────────────────────────────────────────
-
-const STORAGE_GATEWAY_URL = "https://blob.caffeine.ai";
-const BUCKET_NAME = "default-bucket";
-
-async function uploadImageFile(
-  file: File,
-  onProgress?: (pct: number) => void,
-): Promise<string> {
-  // Load env.json to get canister ID and project ID
-  const envBaseUrl = (import.meta.env.BASE_URL as string) || "/";
-  const baseUrl = envBaseUrl.endsWith("/") ? envBaseUrl : `${envBaseUrl}/`;
-  let canisterId = import.meta.env.VITE_CANISTER_ID_BACKEND as
-    | string
-    | undefined;
-  let projectId = "0000000-0000-0000-0000-00000000000";
-
-  try {
-    const res = await fetch(`${baseUrl}env.json`);
-    const cfg = (await res.json()) as {
-      backend_canister_id?: string;
-      project_id?: string;
-    };
-    if (cfg.backend_canister_id && cfg.backend_canister_id !== "undefined") {
-      canisterId = cfg.backend_canister_id;
-    }
-    if (cfg.project_id && cfg.project_id !== "undefined") {
-      projectId = cfg.project_id;
-    }
-  } catch {
-    // fall through with defaults
-  }
-
-  if (!canisterId) {
-    throw new Error("Backend canister ID not available");
-  }
-
-  const { HttpAgent } = await import("@icp-sdk/core/agent");
-  const agent = new HttpAgent({ host: undefined });
-
-  const storageClient = new StorageClient(
-    BUCKET_NAME,
-    STORAGE_GATEWAY_URL,
-    canisterId,
-    projectId,
-    agent,
-  );
-
-  const arrayBuffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
-
-  const { hash } = await storageClient.putFile(bytes, onProgress);
-  return storageClient.getDirectURL(hash);
 }
 
 // ─── Products ────────────────────────────────────────────────────────────────
@@ -233,23 +177,18 @@ export function useAddProduct() {
 
       const resolvedActor = await waitForActorReady(actor, getFromCache);
 
-      let finalImageUrl = imageUrl ?? "";
-      let imageUploadFailed = false;
-
-      // If a file was provided, upload it to blob storage to get a real URL.
-      // On any failure (network, certificate, etc.) fall through and save
-      // the product without an image rather than blocking the add entirely.
+      // Build an ExternalBlob from the provided file or URL
+      let image: ExternalBlob;
       if (imageFile) {
-        try {
-          finalImageUrl = await uploadImageFile(imageFile, onUploadProgress);
-        } catch (uploadErr) {
-          console.warn(
-            "Image upload failed, saving product without image:",
-            uploadErr,
-          );
-          finalImageUrl = "";
-          imageUploadFailed = true;
+        const bytes = new Uint8Array(await imageFile.arrayBuffer());
+        image = ExternalBlob.fromBytes(bytes);
+        if (onUploadProgress) {
+          image = image.withUploadProgress(onUploadProgress);
         }
+      } else if (imageUrl) {
+        image = ExternalBlob.fromURL(imageUrl);
+      } else {
+        image = ExternalBlob.fromURL("");
       }
 
       let newId: Awaited<ReturnType<typeof resolvedActor.addProduct>>;
@@ -258,14 +197,14 @@ export function useAddProduct() {
           name,
           description,
           price,
-          finalImageUrl,
+          image,
           category,
         );
       } catch (err) {
         rethrowFriendly(err);
       }
 
-      return { id: newId, imageUploadFailed };
+      return { id: newId, imageUploadFailed: false };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["products"] });

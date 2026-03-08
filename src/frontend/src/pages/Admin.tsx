@@ -1,5 +1,6 @@
 import { Progress } from "@/components/ui/progress";
 import {
+  Camera,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -10,10 +11,9 @@ import {
   Plus,
   ShoppingBag,
   Trash2,
-  Upload,
   X,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 const ADMIN_PRODUCTS_PER_PAGE = 20;
@@ -172,10 +172,9 @@ function AdminContent() {
     imageUrl: "",
     category: "",
   });
-  const [imageInputMode, setImageInputMode] = useState<"upload" | "url">(
-    "upload",
-  );
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [editingPrice, setEditingPrice] = useState<{
     id: bigint;
@@ -213,10 +212,11 @@ function AdminContent() {
     if (!file) return;
     setNewProduct((p) => ({ ...p, imageFile: file, imageUrl: "" }));
     setImagePreview(URL.createObjectURL(file));
+    setShowUrlInput(false);
   }
 
   function handleImageUrlChange(url: string) {
-    setNewProduct((p) => ({ ...p, imageUrl: url }));
+    setNewProduct((p) => ({ ...p, imageUrl: url, imageFile: null }));
     setImagePreview(url);
   }
 
@@ -233,7 +233,7 @@ function AdminContent() {
     setCategoryError(false);
     setUploadProgress(null);
     try {
-      const result = await addProductMutation.mutateAsync({
+      await addProductMutation.mutateAsync({
         name: newProduct.name,
         description: newProduct.description,
         price: Number.parseFloat(newProduct.price),
@@ -252,13 +252,9 @@ function AdminContent() {
       });
       setImagePreview("");
       setUploadProgress(null);
-      if (result.imageUploadFailed) {
-        toast.warning(
-          "Product saved! Image upload failed — you can add a photo later by re-adding the product.",
-        );
-      } else {
-        toast.success("Product added successfully!");
-      }
+      setShowUrlInput(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      toast.success("Product added successfully!");
     } catch (err) {
       console.error("Add product error:", err);
       setUploadProgress(null);
@@ -525,101 +521,109 @@ function AdminContent() {
                       )}
                     </div>
 
-                    {/* Image input mode toggle */}
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={
-                          imageInputMode === "upload" ? "default" : "outline"
-                        }
-                        className={
-                          imageInputMode === "upload"
-                            ? "bg-black text-white hover:bg-neutral-800 font-semibold"
-                            : "border-black/30 text-black hover:bg-black/10 font-semibold"
-                        }
-                        onClick={() => setImageInputMode("upload")}
+                    {/* Photo upload — hero element */}
+                    <div className="space-y-2">
+                      {/* Hidden file input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        id="product-image-upload"
+                        onChange={handleImageFileChange}
                         data-ocid="admin.image.upload_button"
-                      >
-                        <Upload className="w-3.5 h-3.5 mr-1" />
-                        Upload
-                      </Button>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant={
-                          imageInputMode === "url" ? "default" : "outline"
-                        }
-                        className={
-                          imageInputMode === "url"
-                            ? "bg-black text-white hover:bg-neutral-800 font-semibold"
-                            : "border-black/30 text-black hover:bg-black/10 font-semibold"
-                        }
-                        onClick={() => setImageInputMode("url")}
-                      >
-                        <Link className="w-3.5 h-3.5 mr-1" />
-                        URL
-                      </Button>
-                    </div>
+                      />
 
-                    {imageInputMode === "upload" ? (
-                      <div
-                        className="border-2 border-dashed border-black/25 rounded-lg p-3 text-center cursor-pointer hover:border-black/50 transition-colors"
-                        style={{ backgroundColor: "oklch(0.96 0.03 84)" }}
-                        data-ocid="admin.image.dropzone"
-                      >
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          id="product-image-upload"
-                          onChange={handleImageFileChange}
-                        />
+                      {imagePreview ? (
+                        /* Preview with remove button */
+                        <div className="relative rounded-xl overflow-hidden border-2 border-black/15 shadow-sm">
+                          <img
+                            src={imagePreview}
+                            alt="Product preview"
+                            className="w-full h-44 object-cover"
+                          />
+                          {/* Change photo overlay */}
+                          <label
+                            htmlFor="product-image-upload"
+                            className="absolute inset-0 flex flex-col items-center justify-end pb-3 cursor-pointer bg-gradient-to-t from-black/50 to-transparent"
+                          >
+                            <span className="text-white text-xs font-bold flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/20">
+                              <Camera className="w-3.5 h-3.5" />
+                              Change Photo
+                            </span>
+                          </label>
+                          {/* Remove button */}
+                          <button
+                            type="button"
+                            aria-label="Remove photo"
+                            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center text-white border border-white/20 hover:bg-black transition-colors"
+                            onClick={() => {
+                              setImagePreview("");
+                              setNewProduct((p) => ({
+                                ...p,
+                                imageFile: null,
+                                imageUrl: "",
+                              }));
+                              if (fileInputRef.current)
+                                fileInputRef.current.value = "";
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        /* Tap-to-pick-photo area */
                         <label
                           htmlFor="product-image-upload"
-                          className="cursor-pointer"
+                          className="flex flex-col items-center justify-center gap-3 w-full min-h-[160px] rounded-xl border-2 border-dashed border-black/30 cursor-pointer select-none transition-all active:scale-[0.98] hover:border-black/60 hover:bg-black/[0.03]"
+                          style={{ backgroundColor: "oklch(0.975 0.004 60)" }}
+                          data-ocid="admin.image.dropzone"
                         >
-                          <Upload className="w-6 h-6 text-black/40 mx-auto mb-1" />
-                          <p className="text-xs text-black/55 font-semibold">
-                            Tap to upload from photo library
-                          </p>
+                          <div
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-md border border-black/10"
+                            style={{ backgroundColor: "oklch(0.93 0.015 84)" }}
+                          >
+                            <Camera className="w-8 h-8 text-black/70" />
+                          </div>
+                          <div className="text-center px-4">
+                            <p className="text-base font-extrabold text-black leading-tight">
+                              📸 Choose from Photo Library
+                            </p>
+                            <p className="text-xs text-black/55 font-medium mt-1">
+                              Tap here to pick a photo from your phone
+                            </p>
+                          </div>
                         </label>
-                      </div>
-                    ) : (
-                      <Input
-                        placeholder="Image URL"
-                        value={newProduct.imageUrl}
-                        onChange={(e) => handleImageUrlChange(e.target.value)}
-                        className="bg-gray-50 border-black/20 text-black placeholder:text-black/40"
-                      />
-                    )}
+                      )}
 
-                    {/* Image preview */}
-                    {imagePreview && (
-                      <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="w-full h-32 object-cover rounded-lg border border-black/15"
-                        />
-                        <Button
+                      {/* "or enter URL" toggle link */}
+                      <div className="text-center">
+                        <button
                           type="button"
-                          size="icon"
-                          variant="destructive"
-                          className="absolute top-1 right-1 w-6 h-6"
-                          onClick={() => {
-                            setImagePreview("");
-                            setNewProduct((p) => ({
-                              ...p,
-                              imageFile: null,
-                              imageUrl: "",
-                            }));
-                          }}
+                          className="text-xs text-black/45 hover:text-black/70 font-medium underline underline-offset-2 transition-colors"
+                          onClick={() => setShowUrlInput((v) => !v)}
                         >
-                          <X className="w-3 h-3" />
-                        </Button>
+                          {showUrlInput
+                            ? "Hide URL input"
+                            : "or enter image URL"}
+                        </button>
                       </div>
-                    )}
+
+                      {/* Collapsible URL input */}
+                      {showUrlInput && (
+                        <div className="flex items-center gap-2">
+                          <Link className="w-4 h-4 text-black/35 flex-shrink-0" />
+                          <Input
+                            placeholder="Paste image URL…"
+                            value={newProduct.imageUrl}
+                            onChange={(e) =>
+                              handleImageUrlChange(e.target.value)
+                            }
+                            className="bg-gray-50 border-black/20 text-black placeholder:text-black/35 text-sm"
+                          />
+                        </div>
+                      )}
+                    </div>
 
                     {/* Upload progress */}
                     {uploadProgress !== null && (
@@ -695,7 +699,7 @@ function AdminContent() {
                           <div className="flex items-start gap-3">
                             {/* Product thumbnail */}
                             <ProductThumbnail
-                              imageUrl={product.imageUrl}
+                              imageUrl={product.image.getDirectURL()}
                               name={product.name}
                             />
 
@@ -962,7 +966,9 @@ function AdminContent() {
                                 }}
                               >
                                 <ProductThumbnail
-                                  imageUrl={product?.imageUrl ?? ""}
+                                  imageUrl={
+                                    product?.image?.getDirectURL() ?? ""
+                                  }
                                   name={
                                     product?.name ?? `Product #${productId}`
                                   }
